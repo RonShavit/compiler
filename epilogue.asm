@@ -991,58 +991,57 @@ L_code_ptr_lognot:
         ;;PARAM(0) = closure
 L_code_ptr_bin_apply:
         ;;jmp L_error_division_by_zero
-        enter 0,0
-        cmp qword COUNT, 2
+        enter 0, 0
+        cmp COUNT, 2
         jne L_error_arg_count_2
-
-
         mov rbx, PARAM(0)
-        mov r13, PARAM(1)
+        mov rcx, PARAM(1)
+        assert_closure(rbx)
+        xor rdx, rdx
+        cmp byte [rcx], T_nil
+        je .call_func
 
-        mov rax, rbx
-        cmp byte [rax], T_closure
-        jne L_error_non_closure
 
-        xor r12, r12
-        mov r14, r13
-        mov rsi, SOB_CLOSURE_ENV(rax)
-        mov rdi, SOB_CLOSURE_CODE(rax)
 
 .push_loop:
-        cmp byte [r14], T_nil
-        je .reverse
-        assert_pair(r14)
-        mov r15, SOB_PAIR_CAR(r14)
-        push r15
-        mov r14, SOB_PAIR_CDR(r14)
-        inc r12
+        cmp byte [rcx], T_pair
+        jne .reverse
+        mov r8, [rcx + 1]
+        push qword r8
+        inc rdx
+        mov rcx, [rcx + 1 + 8]
         jmp .push_loop
-.reverse:
-        mov r14, rsp
-        lea r15, [rsp + (8 * r12)]
-        
-.rev_loop: 
-        cmp r14, r15
-        jge .call_func 
-        mov rax, [r14] 
-        mov rdx, [r15- 8] 
-        mov [r14], rdx 
-        mov [r15 - 8], rax 
-        add r14, 8 
-        sub r15, 8 
-        jmp .rev_loop
 
+.reverse:
+        mov r10, rsp
+        mov r11, rsp
+        mov r12, rdx
+        cmp r12, 0
+        jle .call_func
+        dec r12
+        shl r12, 3
+        add r11, r12
+.reverse_loop:
+        cmp r10, r11
+        jge .call_func
+        mov r13, [r10]
+        mov r14, [r11]
+        mov [r10], r14
+        mov [r11], r13
+        add r10, 8
+        sub r11, 8
+        jmp .reverse_loop
 
 
 .call_func:
-        push r12
-
-        push rsi
-        call rdi
-
-
-        leave
-        ret
+        push qword rdx
+        mov r15, [rbx + 1]
+        push qword r15
+        mov rbx, [rbx + 1 + 8]
+        call rbx
+        leave 
+        ret AND_KILL_FRAME(2)
+        
 
 
 L_code_ptr_is_null:

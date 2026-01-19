@@ -920,6 +920,19 @@ L_constants:
 	db T_string	; "void"
 	dq 4
 	db 0x76, 0x6F, 0x69, 0x64
+	; L_constants + 3232:
+	db T_integer	; 10
+	dq 10
+	; L_constants + 3241:
+	db T_string	; "fib"
+	dq 3
+	db 0x66, 0x69, 0x62
+	; L_constants + 3253:
+	db T_interned_symbol	; fib
+	dq L_constants + 3241
+	; L_constants + 3262:
+	db T_interned_symbol	; =
+	dq L_constants + 2375
 free_var_0:	; location of *
 	dq .undefined_object
 .undefined_object:
@@ -2022,37 +2035,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_49]	; free var car
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0001:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0001
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0001
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0001
 .L_tc_recycle_frame_done_0001:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0001:	; new closure is in rax
@@ -2092,37 +2108,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_49]	; free var car
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0002:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0002
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0002
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0002
 .L_tc_recycle_frame_done_0002:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0002:	; new closure is in rax
@@ -2162,37 +2181,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_64]	; free var cdr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0003:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0003
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0003
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0003
 .L_tc_recycle_frame_done_0003:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0003:	; new closure is in rax
@@ -2232,37 +2254,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_64]	; free var cdr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0004:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0004
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0004
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0004
 .L_tc_recycle_frame_done_0004:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0004:	; new closure is in rax
@@ -2302,37 +2327,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_49]	; free var car
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0005:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0005
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0005
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0005
 .L_tc_recycle_frame_done_0005:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0005:	; new closure is in rax
@@ -2372,37 +2400,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_49]	; free var car
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0006:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0006
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0006
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0006
 .L_tc_recycle_frame_done_0006:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0006:	; new closure is in rax
@@ -2442,37 +2473,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_49]	; free var car
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0007:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0007
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0007
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0007
 .L_tc_recycle_frame_done_0007:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0007:	; new closure is in rax
@@ -2512,37 +2546,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_49]	; free var car
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0008:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0008
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0008
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0008
 .L_tc_recycle_frame_done_0008:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0008:	; new closure is in rax
@@ -2582,37 +2619,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_64]	; free var cdr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0009:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0009
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0009
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0009
 .L_tc_recycle_frame_done_0009:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0009:	; new closure is in rax
@@ -2652,37 +2692,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_64]	; free var cdr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_000a:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_000a
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_000a
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_000a
 .L_tc_recycle_frame_done_000a:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_000a:	; new closure is in rax
@@ -2722,37 +2765,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_64]	; free var cdr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_000b:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_000b
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_000b
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_000b
 .L_tc_recycle_frame_done_000b:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_000b:	; new closure is in rax
@@ -2792,37 +2838,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_64]	; free var cdr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_000c:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_000c
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_000c
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_000c
 .L_tc_recycle_frame_done_000c:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_000c:	; new closure is in rax
@@ -2862,37 +2911,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_41]	; free var caar
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_000d:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_000d
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_000d
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_000d
 .L_tc_recycle_frame_done_000d:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_000d:	; new closure is in rax
@@ -2932,37 +2984,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_41]	; free var caar
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_000e:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_000e
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_000e
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_000e
 .L_tc_recycle_frame_done_000e:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_000e:	; new closure is in rax
@@ -3002,37 +3057,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_41]	; free var caar
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_000f:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_000f
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_000f
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_000f
 .L_tc_recycle_frame_done_000f:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_000f:	; new closure is in rax
@@ -3072,37 +3130,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_41]	; free var caar
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0010:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0010
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0010
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0010
 .L_tc_recycle_frame_done_0010:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0010:	; new closure is in rax
@@ -3142,37 +3203,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_48]	; free var cadr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0011:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0011
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0011
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0011
 .L_tc_recycle_frame_done_0011:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0011:	; new closure is in rax
@@ -3212,37 +3276,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_48]	; free var cadr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0012:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0012
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0012
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0012
 .L_tc_recycle_frame_done_0012:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0012:	; new closure is in rax
@@ -3282,37 +3349,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_48]	; free var cadr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0013:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0013
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0013
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0013
 .L_tc_recycle_frame_done_0013:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0013:	; new closure is in rax
@@ -3352,37 +3422,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_48]	; free var cadr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0014:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0014
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0014
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0014
 .L_tc_recycle_frame_done_0014:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0014:	; new closure is in rax
@@ -3422,37 +3495,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_56]	; free var cdar
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0015:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0015
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0015
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0015
 .L_tc_recycle_frame_done_0015:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0015:	; new closure is in rax
@@ -3492,37 +3568,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_56]	; free var cdar
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0016:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0016
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0016
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0016
 .L_tc_recycle_frame_done_0016:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0016:	; new closure is in rax
@@ -3562,37 +3641,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_56]	; free var cdar
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0017:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0017
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0017
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0017
 .L_tc_recycle_frame_done_0017:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0017:	; new closure is in rax
@@ -3632,37 +3714,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_56]	; free var cdar
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0018:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0018
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0018
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0018
 .L_tc_recycle_frame_done_0018:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0018:	; new closure is in rax
@@ -3702,37 +3787,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_63]	; free var cddr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0019:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0019
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0019
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0019
 .L_tc_recycle_frame_done_0019:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0019:	; new closure is in rax
@@ -3772,37 +3860,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_63]	; free var cddr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_001a:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_001a
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_001a
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_001a
 .L_tc_recycle_frame_done_001a:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_001a:	; new closure is in rax
@@ -3842,37 +3933,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_63]	; free var cddr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_001b:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_001b
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_001b
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_001b
 .L_tc_recycle_frame_done_001b:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_001b:	; new closure is in rax
@@ -3912,37 +4006,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_63]	; free var cddr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_001c:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_001c
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_001c
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_001c
 .L_tc_recycle_frame_done_001c:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_001c:	; new closure is in rax
@@ -4010,37 +4107,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_90]	; free var list?
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_001d:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_001d
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_001d
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_001d
 .L_tc_recycle_frame_done_001d:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0001
 .L_if_else_0001:
 	mov rax, L_constants + 2
@@ -4145,37 +4245,40 @@ main:
 	jne .L_or_end_0002
 	mov rax, PARAM(0)	; param q
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_83]	; free var fraction?
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_001e:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_001e
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_001e
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_001e
 .L_tc_recycle_frame_done_001e:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_or_end_0002:
 	leave
 	ret AND_KILL_FRAME(1)
@@ -4288,37 +4391,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_74]	; free var cons
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_001f:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_001f
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_001f
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_001f
 .L_tc_recycle_frame_done_001f:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0003:
 	leave
 	ret AND_KILL_FRAME(2)
@@ -4346,38 +4452,41 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0020:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0020
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0020
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0020
 .L_tc_recycle_frame_done_0020:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(2)
 .L_lambda_opt_end_0002:	; new closure is in rax
@@ -4417,37 +4526,40 @@ main:
 	push rax
 	mov rax, PARAM(1)	; param f
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_33]	; free var apply
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0021:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0021
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0021
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0021
 .L_tc_recycle_frame_done_0021:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(2)
 .L_lambda_simple_end_0022:	; new closure is in rax
@@ -4556,37 +4668,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_74]	; free var cons
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0022:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0022
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0022
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0022
 .L_tc_recycle_frame_done_0022:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0004
 .L_if_else_0004:
 	mov rax, PARAM(0)	; param a
@@ -4653,37 +4768,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param f
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_12]	; free var __bin-apply
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0023:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0023
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0023
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0023
 .L_tc_recycle_frame_done_0023:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(2)
 .L_lambda_opt_end_0003:	; new closure is in rax
@@ -4717,7 +4835,7 @@ main:
 	enter 0, 0
 	mov rax, L_constants + 1993
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 2
 	mov r9, 1
 	call extend_lexical_environment
@@ -4836,38 +4954,41 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var loop
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_0024:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0024
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_0024
-.L_tc_recycle_frame_done_0024:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_0025:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0025
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_0025
+.L_tc_recycle_frame_done_0025:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_or_end_0003:
 	jmp .L_if_end_0005
 .L_if_else_0005:
@@ -4901,36 +5022,39 @@ main:
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var s
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, PARAM(0)	; param loop
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_0025:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0025
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_0025
-.L_tc_recycle_frame_done_0025:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_0026:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0026
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_0026
+.L_tc_recycle_frame_done_0026:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0006
 .L_if_else_0006:
 	mov rax, L_constants + 2
@@ -4938,33 +5062,36 @@ main:
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0025:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_0026:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0026
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_0026
-.L_tc_recycle_frame_done_0026:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_0024:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0024
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_0024
+.L_tc_recycle_frame_done_0024:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(2)
 .L_lambda_opt_end_0004:	; new closure is in rax
@@ -4989,7 +5116,7 @@ main:
 	enter 0, 0
 	mov rax, L_constants + 1993
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 2
 	mov r9, 1
 	call extend_lexical_environment
@@ -5108,38 +5235,41 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var loop
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_0027:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0027
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_0027
-.L_tc_recycle_frame_done_0027:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_0028:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0028
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_0028
+.L_tc_recycle_frame_done_0028:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0007
 .L_if_else_0007:
 	mov rax, L_constants + 2
@@ -5189,36 +5319,39 @@ main:
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var s
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, PARAM(0)	; param loop
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_0028:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0028
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_0028
-.L_tc_recycle_frame_done_0028:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_0029:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0029
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_0029
+.L_tc_recycle_frame_done_0029:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0008
 .L_if_else_0008:
 	mov rax, L_constants + 2
@@ -5227,33 +5360,36 @@ main:
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0027:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_0029:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0029
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_0029
-.L_tc_recycle_frame_done_0029:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_0027:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0027
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_0027
+.L_tc_recycle_frame_done_0027:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(2)
 .L_lambda_opt_end_0005:	; new closure is in rax
@@ -5383,37 +5519,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_74]	; free var cons
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_002a:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_002a
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_002a
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_002a
 .L_tc_recycle_frame_done_002a:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0009:
 	leave
 	ret AND_KILL_FRAME(2)
@@ -5532,37 +5671,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_74]	; free var cons
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_002b:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_002b
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_002b
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_002b
 .L_tc_recycle_frame_done_002b:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_000a:
 	leave
 	ret AND_KILL_FRAME(2)
@@ -5607,38 +5749,41 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param f
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var map-list
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_002c:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_002c
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_002c
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_002c
 .L_tc_recycle_frame_done_002c:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_000b:
 	leave
 	ret AND_KILL_FRAME(2)
@@ -5701,72 +5846,78 @@ main:
 	push rax
 	mov rax, PARAM(1)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_74]	; free var cons
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_002d:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_002d
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_002d
-.L_tc_recycle_frame_done_002d:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
+.L_tc_recycle_frame_loop_002e:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_002e
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_002e
+.L_tc_recycle_frame_done_002e:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(2)
 .L_lambda_simple_end_002d:	; new closure is in rax
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, qword [free_var_80]	; free var fold-left
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_002e:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_002e
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_002e
-.L_tc_recycle_frame_done_002e:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
+.L_tc_recycle_frame_loop_002d:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_002d
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_002d
+.L_tc_recycle_frame_done_002d:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_002c:	; new closure is in rax
@@ -5887,38 +6038,41 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param s1
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var run-2
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_002f:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_002f
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_002f
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_002f
 .L_tc_recycle_frame_done_002f:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_000c:
 	leave
 	ret AND_KILL_FRAME(2)
@@ -6003,37 +6157,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_74]	; free var cons
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0030:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0030
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0030
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0030
 .L_tc_recycle_frame_done_0030:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_000d:
 	leave
 	ret AND_KILL_FRAME(2)
@@ -6100,38 +6257,41 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var run-1
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0031:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0031
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0031
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0031
 .L_tc_recycle_frame_done_0031:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_000e:
 	leave
 	ret AND_KILL_FRAME(1)
@@ -6268,38 +6428,41 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param f
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
 .L_tc_recycle_frame_loop_0032:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0032
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0032
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0032
 .L_tc_recycle_frame_done_0032:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_000f:
 	leave
 	ret AND_KILL_FRAME(3)
@@ -6329,38 +6492,41 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param f
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
 .L_tc_recycle_frame_loop_0033:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0033
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0033
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0033
 .L_tc_recycle_frame_done_0033:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(3)
 .L_lambda_opt_end_0008:	; new closure is in rax
@@ -6521,37 +6687,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param f
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_33]	; free var apply
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0034:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0034
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0034
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0034
 .L_tc_recycle_frame_done_0034:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0010:
 	leave
 	ret AND_KILL_FRAME(3)
@@ -6581,38 +6750,41 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param f
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
 .L_tc_recycle_frame_loop_0035:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0035
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0035
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0035
 .L_tc_recycle_frame_done_0035:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(3)
 .L_lambda_opt_end_0009:	; new closure is in rax
@@ -6689,38 +6861,41 @@ main:
 	push rax
 	mov rax, L_constants + 2148
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0036:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0036
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0036
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0036
 .L_tc_recycle_frame_done_0036:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(0)
 .L_lambda_simple_end_0036:	; new closure is in rax
@@ -6779,37 +6954,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_11]	; free var __bin-add-zz
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0037:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0037
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0037
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0037
 .L_tc_recycle_frame_done_0037:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0013
 .L_if_else_0013:
 	mov rax, PARAM(1)	; param b
@@ -6841,37 +7019,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_9]	; free var __bin-add-qq
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0038:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0038
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0038
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0038
 .L_tc_recycle_frame_done_0038:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0012
 .L_if_else_0012:
 	mov rax, PARAM(1)	; param b
@@ -6903,72 +7084,77 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_10]	; free var __bin-add-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0039:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0039
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0039
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0039
 .L_tc_recycle_frame_done_0039:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0011
 .L_if_else_0011:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_003a:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_003a
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_003a
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_003a
 .L_tc_recycle_frame_done_003a:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0011:
 .L_if_end_0012:
 .L_if_end_0013:
@@ -7017,37 +7203,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_9]	; free var __bin-add-qq
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_003b:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_003b
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_003b
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_003b
 .L_tc_recycle_frame_done_003b:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0016
 .L_if_else_0016:
 	mov rax, PARAM(1)	; param b
@@ -7068,37 +7257,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_9]	; free var __bin-add-qq
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_003c:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_003c
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_003c
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_003c
 .L_tc_recycle_frame_done_003c:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0015
 .L_if_else_0015:
 	mov rax, PARAM(1)	; param b
@@ -7130,72 +7322,77 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_10]	; free var __bin-add-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_003d:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_003d
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_003d
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_003d
 .L_tc_recycle_frame_done_003d:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0014
 .L_if_else_0014:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_003e:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_003e
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_003e
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_003e
 .L_tc_recycle_frame_done_003e:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0014:
 .L_if_end_0015:
 .L_if_end_0016:
@@ -7244,37 +7441,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_10]	; free var __bin-add-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_003f:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_003f
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_003f
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_003f
 .L_tc_recycle_frame_done_003f:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0019
 .L_if_else_0019:
 	mov rax, PARAM(1)	; param b
@@ -7306,37 +7506,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_10]	; free var __bin-add-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0040:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0040
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0040
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0040
 .L_tc_recycle_frame_done_0040:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0018
 .L_if_else_0018:
 	mov rax, PARAM(1)	; param b
@@ -7357,110 +7560,117 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_10]	; free var __bin-add-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0041:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0041
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0041
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0041
 .L_tc_recycle_frame_done_0041:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0017
 .L_if_else_0017:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_0042:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0042
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0042
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0042
 .L_tc_recycle_frame_done_0042:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0017:
 .L_if_end_0018:
 .L_if_end_0019:
 	jmp .L_if_end_001a
 .L_if_else_001a:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_0043:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0043
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0043
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0043
 .L_tc_recycle_frame_done_0043:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_001a:
 .L_if_end_001b:
 .L_if_end_001c:
@@ -7495,37 +7705,40 @@ main:
 	mov rax, qword [rax + 8 * 0]	; bound var bin+
 	mov rax, qword [rax]
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, qword [free_var_80]	; free var fold-left
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
 .L_tc_recycle_frame_loop_0044:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0044
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0044
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0044
 .L_tc_recycle_frame_done_0044:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_opt_end_000a:	; new closure is in rax
@@ -7602,38 +7815,41 @@ main:
 	push rax
 	mov rax, L_constants + 2251
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0045:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0045
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0045
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0045
 .L_tc_recycle_frame_done_0045:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(0)
 .L_lambda_simple_end_0039:	; new closure is in rax
@@ -7692,37 +7908,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_27]	; free var __bin-sub-zz
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0046:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0046
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0046
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0046
 .L_tc_recycle_frame_done_0046:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_001f
 .L_if_else_001f:
 	mov rax, PARAM(1)	; param b
@@ -7754,37 +7973,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_25]	; free var __bin-sub-qq
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0047:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0047
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0047
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0047
 .L_tc_recycle_frame_done_0047:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_001e
 .L_if_else_001e:
 	mov rax, PARAM(1)	; param b
@@ -7816,72 +8038,77 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_26]	; free var __bin-sub-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0048:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0048
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0048
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0048
 .L_tc_recycle_frame_done_0048:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_001d
 .L_if_else_001d:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_0049:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0049
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0049
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0049
 .L_tc_recycle_frame_done_0049:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_001d:
 .L_if_end_001e:
 .L_if_end_001f:
@@ -7930,37 +8157,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_25]	; free var __bin-sub-qq
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_004a:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_004a
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_004a
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_004a
 .L_tc_recycle_frame_done_004a:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0022
 .L_if_else_0022:
 	mov rax, PARAM(1)	; param b
@@ -7981,37 +8211,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_25]	; free var __bin-sub-qq
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_004b:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_004b
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_004b
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_004b
 .L_tc_recycle_frame_done_004b:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0021
 .L_if_else_0021:
 	mov rax, PARAM(1)	; param b
@@ -8043,72 +8276,77 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_26]	; free var __bin-sub-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_004c:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_004c
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_004c
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_004c
 .L_tc_recycle_frame_done_004c:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0020
 .L_if_else_0020:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_004d:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_004d
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_004d
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_004d
 .L_tc_recycle_frame_done_004d:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0020:
 .L_if_end_0021:
 .L_if_end_0022:
@@ -8157,37 +8395,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_26]	; free var __bin-sub-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_004e:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_004e
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_004e
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_004e
 .L_tc_recycle_frame_done_004e:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0025
 .L_if_else_0025:
 	mov rax, PARAM(1)	; param b
@@ -8219,37 +8460,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_26]	; free var __bin-sub-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_004f:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_004f
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_004f
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_004f
 .L_tc_recycle_frame_done_004f:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0024
 .L_if_else_0024:
 	mov rax, PARAM(1)	; param b
@@ -8270,110 +8514,117 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_26]	; free var __bin-sub-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0050:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0050
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0050
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0050
 .L_tc_recycle_frame_done_0050:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0023
 .L_if_else_0023:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_0051:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0051
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0051
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0051
 .L_tc_recycle_frame_done_0051:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0023:
 .L_if_end_0024:
 .L_if_end_0025:
 	jmp .L_if_end_0026
 .L_if_else_0026:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_0052:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0052
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0052
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0052
 .L_tc_recycle_frame_done_0052:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0026:
 .L_if_end_0027:
 .L_if_end_0028:
@@ -8417,38 +8668,41 @@ main:
 	push rax
 	mov rax, L_constants + 2232
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var bin-
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0053:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0053
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0053
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0053
 .L_tc_recycle_frame_done_0053:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0029
 .L_if_else_0029:
 	mov rax, PARAM(1)	; param s
@@ -8470,7 +8724,7 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 2
 	mov r9, 2
 	call extend_lexical_environment
@@ -8495,68 +8749,74 @@ main:
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 1]
 	mov rax, qword [rax + 8 * 0]	; bound var bin-
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_0054:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0054
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_0054
-.L_tc_recycle_frame_done_0054:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
+.L_tc_recycle_frame_loop_0055:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0055
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_0055
+.L_tc_recycle_frame_done_0055:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_003b:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_0055:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0055
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_0055
-.L_tc_recycle_frame_done_0055:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_0054:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0054
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_0054
+.L_tc_recycle_frame_done_0054:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0029:
 	leave
 	ret AND_KILL_FRAME(2)
@@ -8634,38 +8894,41 @@ main:
 	push rax
 	mov rax, L_constants + 2283
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0056:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0056
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0056
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0056
 .L_tc_recycle_frame_done_0056:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(0)
 .L_lambda_simple_end_003d:	; new closure is in rax
@@ -8724,37 +8987,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_24]	; free var __bin-mul-zz
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0057:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0057
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0057
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0057
 .L_tc_recycle_frame_done_0057:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_002c
 .L_if_else_002c:
 	mov rax, PARAM(1)	; param b
@@ -8786,37 +9052,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_22]	; free var __bin-mul-qq
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0058:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0058
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0058
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0058
 .L_tc_recycle_frame_done_0058:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_002b
 .L_if_else_002b:
 	mov rax, PARAM(1)	; param b
@@ -8848,72 +9117,77 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_23]	; free var __bin-mul-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0059:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0059
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0059
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0059
 .L_tc_recycle_frame_done_0059:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_002a
 .L_if_else_002a:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_005a:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_005a
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_005a
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_005a
 .L_tc_recycle_frame_done_005a:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_002a:
 .L_if_end_002b:
 .L_if_end_002c:
@@ -8962,37 +9236,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_22]	; free var __bin-mul-qq
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_005b:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_005b
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_005b
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_005b
 .L_tc_recycle_frame_done_005b:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_002f
 .L_if_else_002f:
 	mov rax, PARAM(1)	; param b
@@ -9013,37 +9290,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_22]	; free var __bin-mul-qq
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_005c:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_005c
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_005c
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_005c
 .L_tc_recycle_frame_done_005c:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_002e
 .L_if_else_002e:
 	mov rax, PARAM(1)	; param b
@@ -9075,72 +9355,77 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_23]	; free var __bin-mul-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_005d:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_005d
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_005d
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_005d
 .L_tc_recycle_frame_done_005d:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_002d
 .L_if_else_002d:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_005e:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_005e
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_005e
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_005e
 .L_tc_recycle_frame_done_005e:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_002d:
 .L_if_end_002e:
 .L_if_end_002f:
@@ -9189,37 +9474,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_23]	; free var __bin-mul-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_005f:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_005f
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_005f
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_005f
 .L_tc_recycle_frame_done_005f:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0032
 .L_if_else_0032:
 	mov rax, PARAM(1)	; param b
@@ -9251,37 +9539,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_23]	; free var __bin-mul-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0060:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0060
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0060
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0060
 .L_tc_recycle_frame_done_0060:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0031
 .L_if_else_0031:
 	mov rax, PARAM(1)	; param b
@@ -9302,110 +9593,117 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_23]	; free var __bin-mul-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0061:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0061
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0061
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0061
 .L_tc_recycle_frame_done_0061:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0030
 .L_if_else_0030:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_0062:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0062
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0062
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0062
 .L_tc_recycle_frame_done_0062:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0030:
 .L_if_end_0031:
 .L_if_end_0032:
 	jmp .L_if_end_0033
 .L_if_else_0033:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_0063:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0063
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0063
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0063
 .L_tc_recycle_frame_done_0063:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0033:
 .L_if_end_0034:
 .L_if_end_0035:
@@ -9440,37 +9738,40 @@ main:
 	mov rax, qword [rax + 8 * 0]	; bound var bin*
 	mov rax, qword [rax]
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, qword [free_var_80]	; free var fold-left
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
 .L_tc_recycle_frame_loop_0064:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0064
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0064
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0064
 .L_tc_recycle_frame_done_0064:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_opt_end_000c:	; new closure is in rax
@@ -9547,38 +9848,41 @@ main:
 	push rax
 	mov rax, L_constants + 2311
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0065:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0065
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0065
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0065
 .L_tc_recycle_frame_done_0065:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(0)
 .L_lambda_simple_end_0040:	; new closure is in rax
@@ -9637,37 +9941,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_15]	; free var __bin-div-zz
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0066:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0066
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0066
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0066
 .L_tc_recycle_frame_done_0066:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0038
 .L_if_else_0038:
 	mov rax, PARAM(1)	; param b
@@ -9699,37 +10006,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_13]	; free var __bin-div-qq
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0067:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0067
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0067
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0067
 .L_tc_recycle_frame_done_0067:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0037
 .L_if_else_0037:
 	mov rax, PARAM(1)	; param b
@@ -9761,72 +10071,77 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_14]	; free var __bin-div-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0068:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0068
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0068
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0068
 .L_tc_recycle_frame_done_0068:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0036
 .L_if_else_0036:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_0069:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0069
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0069
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0069
 .L_tc_recycle_frame_done_0069:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0036:
 .L_if_end_0037:
 .L_if_end_0038:
@@ -9875,37 +10190,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_13]	; free var __bin-div-qq
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_006a:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_006a
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_006a
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_006a
 .L_tc_recycle_frame_done_006a:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_003b
 .L_if_else_003b:
 	mov rax, PARAM(1)	; param b
@@ -9926,37 +10244,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_13]	; free var __bin-div-qq
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_006b:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_006b
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_006b
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_006b
 .L_tc_recycle_frame_done_006b:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_003a
 .L_if_else_003a:
 	mov rax, PARAM(1)	; param b
@@ -9988,72 +10309,77 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_14]	; free var __bin-div-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_006c:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_006c
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_006c
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_006c
 .L_tc_recycle_frame_done_006c:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0039
 .L_if_else_0039:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_006d:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_006d
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_006d
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_006d
 .L_tc_recycle_frame_done_006d:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0039:
 .L_if_end_003a:
 .L_if_end_003b:
@@ -10102,37 +10428,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_14]	; free var __bin-div-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_006e:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_006e
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_006e
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_006e
 .L_tc_recycle_frame_done_006e:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_003e
 .L_if_else_003e:
 	mov rax, PARAM(1)	; param b
@@ -10164,37 +10493,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_14]	; free var __bin-div-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_006f:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_006f
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_006f
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_006f
 .L_tc_recycle_frame_done_006f:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_003d
 .L_if_else_003d:
 	mov rax, PARAM(1)	; param b
@@ -10215,110 +10547,117 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_14]	; free var __bin-div-rr
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0070:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0070
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0070
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0070
 .L_tc_recycle_frame_done_0070:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_003c
 .L_if_else_003c:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_0071:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0071
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0071
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0071
 .L_tc_recycle_frame_done_0071:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_003c:
 .L_if_end_003d:
 .L_if_end_003e:
 	jmp .L_if_end_003f
 .L_if_else_003f:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var error
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_0072:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0072
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0072
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0072
 .L_tc_recycle_frame_done_0072:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_003f:
 .L_if_end_0040:
 .L_if_end_0041:
@@ -10362,38 +10701,41 @@ main:
 	push rax
 	mov rax, L_constants + 2292
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var bin/
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0073:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0073
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0073
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0073
 .L_tc_recycle_frame_done_0073:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0042
 .L_if_else_0042:
 	mov rax, PARAM(1)	; param s
@@ -10415,7 +10757,7 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 2
 	mov r9, 2
 	call extend_lexical_environment
@@ -10440,68 +10782,74 @@ main:
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 1]
 	mov rax, qword [rax + 8 * 0]	; bound var bin/
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_0074:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0074
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_0074
-.L_tc_recycle_frame_done_0074:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
+.L_tc_recycle_frame_loop_0075:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0075
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_0075
+.L_tc_recycle_frame_done_0075:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0042:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_0075:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0075
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_0075
-.L_tc_recycle_frame_done_0075:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_0074:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0074
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_0074
+.L_tc_recycle_frame_done_0074:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0042:
 	leave
 	ret AND_KILL_FRAME(2)
@@ -10583,37 +10931,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param n
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_0]	; free var *
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0076:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0076
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0076
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0076
 .L_tc_recycle_frame_done_0076:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0043:
 	leave
 	ret AND_KILL_FRAME(1)
@@ -10750,37 +11101,40 @@ main:
 	push rax
 	mov rax, L_constants + 2412
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_77]	; free var error
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0077:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0077
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0077
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0077
 .L_tc_recycle_frame_done_0077:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(0)
 .L_lambda_simple_end_0045:	; new closure is in rax
@@ -10857,37 +11211,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var comparator-zz
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0078:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0078
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0078
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0078
 .L_tc_recycle_frame_done_0078:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0046
 .L_if_else_0046:
 	mov rax, PARAM(1)	; param b
@@ -10919,37 +11276,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var comparator-qq
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0079:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0079
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0079
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0079
 .L_tc_recycle_frame_done_0079:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0045
 .L_if_else_0045:
 	mov rax, PARAM(1)	; param b
@@ -10981,72 +11341,77 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 2]	; bound var comparator-rr
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_007a:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_007a
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_007a
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_007a
 .L_tc_recycle_frame_done_007a:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0044
 .L_if_else_0044:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 1]
 	mov rax, qword [rax + 8 * 6]	; bound var exit
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_007b:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_007b
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_007b
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_007b
 .L_tc_recycle_frame_done_007b:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0044:
 .L_if_end_0045:
 .L_if_end_0046:
@@ -11095,37 +11460,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var comparator-qq
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_007c:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_007c
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_007c
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_007c
 .L_tc_recycle_frame_done_007c:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0049
 .L_if_else_0049:
 	mov rax, PARAM(1)	; param b
@@ -11146,37 +11514,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var comparator-qq
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_007d:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_007d
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_007d
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_007d
 .L_tc_recycle_frame_done_007d:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0048
 .L_if_else_0048:
 	mov rax, PARAM(1)	; param b
@@ -11208,72 +11579,77 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 2]	; bound var comparator-rr
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_007e:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_007e
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_007e
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_007e
 .L_tc_recycle_frame_done_007e:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0047
 .L_if_else_0047:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 1]
 	mov rax, qword [rax + 8 * 6]	; bound var exit
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_007f:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_007f
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_007f
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_007f
 .L_tc_recycle_frame_done_007f:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0047:
 .L_if_end_0048:
 .L_if_end_0049:
@@ -11322,37 +11698,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 2]	; bound var comparator-rr
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0080:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0080
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0080
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0080
 .L_tc_recycle_frame_done_0080:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_004c
 .L_if_else_004c:
 	mov rax, PARAM(1)	; param b
@@ -11384,37 +11763,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 2]	; bound var comparator-rr
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0081:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0081
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0081
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0081
 .L_tc_recycle_frame_done_0081:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_004b
 .L_if_else_004b:
 	mov rax, PARAM(1)	; param b
@@ -11435,110 +11817,117 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 2]	; bound var comparator-rr
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0082:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0082
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0082
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0082
 .L_tc_recycle_frame_done_0082:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_004a
 .L_if_else_004a:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 1]
 	mov rax, qword [rax + 8 * 6]	; bound var exit
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_0083:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0083
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0083
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0083
 .L_tc_recycle_frame_done_0083:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_004a:
 .L_if_end_004b:
 .L_if_end_004c:
 	jmp .L_if_end_004d
 .L_if_else_004d:
-
-	push qword 0 ; push m (num of args)
+	push 0
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 1]
 	mov rax, qword [rax + 8 * 6]	; bound var exit
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 0 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 0
+	mov r12, rdi
+	lea rdi, [r12 + -8]	; Dest_High
+	lea rsi, [rsp + -8]	; Source_High
+	mov r10, 0
 .L_tc_recycle_frame_loop_0084:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0084
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0084
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0084
 .L_tc_recycle_frame_done_0084:
-	mov rsp, rbp
-	sub rsp, 24
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_004d:
 .L_if_end_004e:
 .L_if_end_004f:
@@ -11635,37 +12024,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_100]	; free var not
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0085:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0085
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0085
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0085
 .L_tc_recycle_frame_done_0085:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(2)
 .L_lambda_simple_end_0048:	; new closure is in rax
@@ -11696,38 +12088,41 @@ main:
 	push rax
 	mov rax, PARAM(1)	; param b
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 4]	; bound var bin<?
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0086:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0086
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0086
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0086
 .L_tc_recycle_frame_done_0086:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(2)
 .L_lambda_simple_end_0049:	; new closure is in rax
@@ -11770,37 +12165,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_100]	; free var not
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0087:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0087
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0087
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0087
 .L_tc_recycle_frame_done_0087:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(2)
 .L_lambda_simple_end_004a:	; new closure is in rax
@@ -11829,7 +12227,7 @@ main:
 	enter 0, 0
 	mov rax, L_constants + 1993
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 1
 	mov r9, 2
 	call extend_lexical_environment
@@ -11940,38 +12338,41 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_0088:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0088
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_0088
-.L_tc_recycle_frame_done_0088:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
+.L_tc_recycle_frame_loop_008a:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_008a
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_008a
+.L_tc_recycle_frame_done_008a:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0050
 .L_if_else_0050:
 	mov rax, L_constants + 2
@@ -12003,76 +12404,82 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_0089:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0089
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_0089
-.L_tc_recycle_frame_done_0089:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
+.L_tc_recycle_frame_loop_008b:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_008b
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_008b
+.L_tc_recycle_frame_done_008b:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(2)
 .L_lambda_opt_end_000e:	; new closure is in rax
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_004c:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_008a:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_008a
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_008a
-.L_tc_recycle_frame_done_008a:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_0089:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0089
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_0089
+.L_tc_recycle_frame_done_0089:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_004b:	; new closure is in rax
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 7
 	mov r9, 1
 	call extend_lexical_environment
@@ -12173,33 +12580,36 @@ main:
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_004e:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_008b:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_008b
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_008b
-.L_tc_recycle_frame_done_008b:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_0088:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0088
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_0088
+.L_tc_recycle_frame_done_0088:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(7)
 .L_lambda_simple_end_0044:	; new closure is in rax
@@ -12295,37 +12705,40 @@ main:
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var comparator
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_33]	; free var apply
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_008c:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_008c
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_008c
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_008c
 .L_tc_recycle_frame_done_008c:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_opt_end_000f:	; new closure is in rax
@@ -12509,37 +12922,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_90]	; free var list?
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_008d:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_008d
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_008d
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_008d
 .L_tc_recycle_frame_done_008d:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0051
 .L_if_else_0051:
 	mov rax, L_constants + 2
@@ -12681,7 +13097,7 @@ main:
 .L_if_end_0053:
 .L_if_end_0054:
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 2
 	mov r9, 2
 	call extend_lexical_environment
@@ -12706,67 +13122,73 @@ main:
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var n
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 1]
 	mov rax, qword [rax + 8 * 0]	; bound var asm-make-vector
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_008e:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_008e
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_008e
-.L_tc_recycle_frame_done_008e:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
+.L_tc_recycle_frame_loop_008f:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_008f
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_008f
+.L_tc_recycle_frame_done_008f:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0053:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_008f:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_008f
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_008f
-.L_tc_recycle_frame_done_008f:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_008e:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_008e
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_008e
+.L_tc_recycle_frame_done_008e:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(2)
 .L_lambda_opt_end_0010:	; new closure is in rax
@@ -12912,7 +13334,7 @@ main:
 .L_if_end_0056:
 .L_if_end_0057:
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 2
 	mov r9, 2
 	call extend_lexical_environment
@@ -12937,67 +13359,73 @@ main:
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var n
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 1]
 	mov rax, qword [rax + 8 * 0]	; bound var asm-make-string
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_0090:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0090
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_0090
-.L_tc_recycle_frame_done_0090:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
+.L_tc_recycle_frame_loop_0091:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0091
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_0091
+.L_tc_recycle_frame_done_0091:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0055:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_0091:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0091
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_0091
-.L_tc_recycle_frame_done_0091:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_0090:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0090
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_0090
+.L_tc_recycle_frame_done_0090:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(2)
 .L_lambda_opt_end_0011:	; new closure is in rax
@@ -13079,37 +13507,40 @@ main:
 	push rax
 	mov rax, PARAM(1)	; param i
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_95]	; free var make-vector
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0092:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0092
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0092
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0092
 .L_tc_recycle_frame_done_0092:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0058
 .L_if_else_0058:
 	mov rax, L_constants + 2292
@@ -13152,7 +13583,7 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 2
 	mov r9, 2
 	call extend_lexical_environment
@@ -13207,33 +13638,36 @@ main:
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0058:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0093:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0093
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0093
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0093
 .L_tc_recycle_frame_done_0093:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0058:
 	leave
 	ret AND_KILL_FRAME(2)
@@ -13265,38 +13699,41 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param s
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0094:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0094
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0094
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0094
 .L_tc_recycle_frame_done_0094:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0059:	; new closure is in rax
@@ -13378,37 +13815,40 @@ main:
 	push rax
 	mov rax, PARAM(1)	; param i
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_93]	; free var make-string
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0095:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0095
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0095
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0095
 .L_tc_recycle_frame_done_0095:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0059
 .L_if_else_0059:
 	mov rax, L_constants + 2292
@@ -13451,7 +13891,7 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 2
 	mov r9, 2
 	call extend_lexical_environment
@@ -13506,33 +13946,36 @@ main:
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_005c:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0096:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0096
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0096
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0096
 .L_tc_recycle_frame_done_0096:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0059:
 	leave
 	ret AND_KILL_FRAME(2)
@@ -13564,38 +14007,41 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param s
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0097:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0097
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0097
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0097
 .L_tc_recycle_frame_done_0097:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_005d:	; new closure is in rax
@@ -13629,37 +14075,40 @@ main:
 	enter 0, 0
 	mov rax, PARAM(0)	; param s
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_89]	; free var list->vector
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_0098:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0098
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0098
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0098
 .L_tc_recycle_frame_done_0098:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_opt_end_0012:	; new closure is in rax
@@ -13776,37 +14225,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_74]	; free var cons
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_0099:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_0099
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_0099
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_0099
 .L_tc_recycle_frame_done_0099:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_005a
 .L_if_else_005a:
 	mov rax, L_constants + 1
@@ -13854,38 +14306,41 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param str
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
 .L_tc_recycle_frame_loop_009a:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_009a
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_009a
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_009a
 .L_tc_recycle_frame_done_009a:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0060:	; new closure is in rax
@@ -14011,37 +14466,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_74]	; free var cons
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_009b:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_009b
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_009b
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_009b
 .L_tc_recycle_frame_done_009b:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_005b
 .L_if_else_005b:
 	mov rax, L_constants + 1
@@ -14089,38 +14547,41 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param v
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
 .L_tc_recycle_frame_loop_009c:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_009c
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_009c
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_009c
 .L_tc_recycle_frame_done_009c:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0063:	; new closure is in rax
@@ -14170,37 +14631,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_111]	; free var remainder
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_009d:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_009d
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_009d
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_009d
 .L_tc_recycle_frame_done_009d:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0064:	; new closure is in rax
@@ -14231,37 +14695,40 @@ main:
 	push rax
 	mov rax, L_constants + 2232
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_4]	; free var <
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_009e:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_009e
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_009e
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_009e
 .L_tc_recycle_frame_done_009e:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0065:	; new closure is in rax
@@ -14292,37 +14759,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param x
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_4]	; free var <
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_009f:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_009f
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_009f
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_009f
 .L_tc_recycle_frame_done_009f:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0066:	; new closure is in rax
@@ -14364,37 +14834,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_135]	; free var zero?
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_00a0:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00a0
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00a0
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00a0
 .L_tc_recycle_frame_done_00a0:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0067:	; new closure is in rax
@@ -14434,37 +14907,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_100]	; free var not
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_00a1:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00a1
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00a1
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00a1
 .L_tc_recycle_frame_done_00a1:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0068:	; new closure is in rax
@@ -14507,37 +14983,40 @@ main:
 	je .L_if_else_005c
 	mov rax, PARAM(0)	; param x
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_2]	; free var -
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_00a2:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00a2
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00a2
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00a2
 .L_tc_recycle_frame_done_00a2:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_005c
 .L_if_else_005c:
 	mov rax, PARAM(0)	; param x
@@ -14664,37 +15143,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_76]	; free var equal?
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_00a3:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00a3
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00a3
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00a3
 .L_tc_recycle_frame_done_00a3:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_005e
 .L_if_else_005e:
 	mov rax, L_constants + 2
@@ -14801,37 +15283,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_76]	; free var equal?
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_00a4:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00a4
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00a4
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00a4
 .L_tc_recycle_frame_done_00a4:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0068
 .L_if_else_0068:
 	mov rax, PARAM(0)	; param e1
@@ -14912,37 +15397,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param e1
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_120]	; free var string=?
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_00a5:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00a5
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00a5
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00a5
 .L_tc_recycle_frame_done_00a5:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0067
 .L_if_else_0067:
 	mov rax, PARAM(0)	; param e1
@@ -14981,37 +15469,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param e1
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_6]	; free var =
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_00a6:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00a6
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00a6
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00a6
 .L_tc_recycle_frame_done_00a6:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0066
 .L_if_else_0066:
 	mov rax, PARAM(0)	; param e1
@@ -15050,74 +15541,80 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param e1
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_70]	; free var char=?
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_00a7:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00a7
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00a7
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00a7
 .L_tc_recycle_frame_done_00a7:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0065
 .L_if_else_0065:
 	mov rax, PARAM(1)	; param e2
 	push rax
 	mov rax, PARAM(0)	; param e1
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_75]	; free var eq?
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_00a8:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00a8
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00a8
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00a8
 .L_tc_recycle_frame_done_00a8:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0065:
 .L_if_end_0066:
 .L_if_end_0067:
@@ -15195,37 +15692,40 @@ main:
 	je .L_if_else_006a
 	mov rax, PARAM(1)	; param s
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_49]	; free var car
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_00a9:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00a9
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00a9
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00a9
 .L_tc_recycle_frame_done_00a9:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_006a
 .L_if_else_006a:
 	mov rax, PARAM(1)	; param s
@@ -15243,37 +15743,40 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param a
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_34]	; free var assoc
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_00aa:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00aa
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00aa
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00aa
 .L_tc_recycle_frame_done_00aa:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_006a:
 .L_if_end_006b:
 	leave
@@ -15411,7 +15914,7 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 3
 	mov r9, 2
 	call extend_lexical_environment
@@ -15451,68 +15954,74 @@ main:
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var target
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 1]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00ab:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00ab
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00ab
-.L_tc_recycle_frame_done_00ab:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
+.L_tc_recycle_frame_loop_00ac:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00ac
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00ac
+.L_tc_recycle_frame_done_00ac:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_006e:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00ac:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00ac
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00ac
-.L_tc_recycle_frame_done_00ac:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00ab:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00ab
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00ab
+.L_tc_recycle_frame_done_00ab:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_006c:
 	leave
 	ret AND_KILL_FRAME(3)
@@ -15622,38 +16131,41 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param target
 	push rax
-	push qword 5 ; push m (num of args)
+	push 5
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var add
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 5 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 40
+	mov r12, rdi
+	lea rdi, [r12 + 32]	; Dest_High
+	lea rsi, [rsp + 32]	; Source_High
+	mov r10, 5
 .L_tc_recycle_frame_loop_00ad:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00ad
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00ad
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00ad
 .L_tc_recycle_frame_done_00ad:
-	mov rsp, rbp
-	sub rsp, 64
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_006d
 .L_if_else_006d:
 	mov rax, PARAM(1)	; param i
@@ -15727,38 +16239,41 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
 .L_tc_recycle_frame_loop_00ae:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00ae
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00ae
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00ae
 .L_tc_recycle_frame_done_00ae:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_opt_end_0013:	; new closure is in rax
@@ -15903,7 +16418,7 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 3
 	mov r9, 2
 	call extend_lexical_environment
@@ -15943,68 +16458,74 @@ main:
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var target
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 1]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00af:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00af
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00af
-.L_tc_recycle_frame_done_00af:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
+.L_tc_recycle_frame_loop_00b0:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00b0
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00b0
+.L_tc_recycle_frame_done_00b0:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0072:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00b0:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00b0
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00b0
-.L_tc_recycle_frame_done_00b0:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00af:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00af
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00af
+.L_tc_recycle_frame_done_00af:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_006e:
 	leave
 	ret AND_KILL_FRAME(3)
@@ -16114,38 +16635,41 @@ main:
 	push rax
 	mov rax, PARAM(0)	; param target
 	push rax
-	push qword 5 ; push m (num of args)
+	push 5
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 1]	; bound var add
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 5 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 40
+	mov r12, rdi
+	lea rdi, [r12 + 32]	; Dest_High
+	lea rsi, [rsp + 32]	; Source_High
+	mov r10, 5
 .L_tc_recycle_frame_loop_00b1:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00b1
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00b1
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00b1
 .L_tc_recycle_frame_done_00b1:
-	mov rsp, rbp
-	sub rsp, 64
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_006f
 .L_if_else_006f:
 	mov rax, PARAM(1)	; param i
@@ -16219,38 +16743,41 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
 .L_tc_recycle_frame_loop_00b2:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00b2
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00b2
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00b2
 .L_tc_recycle_frame_done_00b2:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_opt_end_0014:	; new closure is in rax
@@ -16310,37 +16837,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_88]	; free var list->string
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_00b3:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00b3
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00b3
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00b3
 .L_tc_recycle_frame_done_00b3:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0074:	; new closure is in rax
@@ -16391,37 +16921,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_89]	; free var list->vector
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_00b4:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00b4
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00b4
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00b4
 .L_tc_recycle_frame_done_00b4:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0075:	; new closure is in rax
@@ -16507,7 +17040,7 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 3
 	mov r9, 2
 	call extend_lexical_environment
@@ -16623,68 +17156,74 @@ main:
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var str
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 1]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00b5:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00b5
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00b5
-.L_tc_recycle_frame_done_00b5:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
+.L_tc_recycle_frame_loop_00b6:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00b6
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00b6
+.L_tc_recycle_frame_done_00b6:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0078:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00b6:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00b6
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00b6
-.L_tc_recycle_frame_done_00b6:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00b5:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00b5
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00b5
+.L_tc_recycle_frame_done_00b5:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0070
 .L_if_else_0070:
 	mov rax, PARAM(0)	; param str
@@ -16728,7 +17267,7 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 1
 	mov r9, 2
 	call extend_lexical_environment
@@ -16787,69 +17326,75 @@ main:
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var str
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 1]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00b7:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00b7
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00b7
-.L_tc_recycle_frame_done_00b7:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
+.L_tc_recycle_frame_loop_00b8:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00b8
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00b8
+.L_tc_recycle_frame_done_00b8:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0071:
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_007a:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00b8:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00b8
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00b8
-.L_tc_recycle_frame_done_00b8:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00b7:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00b7
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00b7
+.L_tc_recycle_frame_done_00b7:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0079:	; new closure is in rax
@@ -16944,7 +17489,7 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 3
 	mov r9, 2
 	call extend_lexical_environment
@@ -17060,68 +17605,74 @@ main:
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var vec
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 1]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00b9:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00b9
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00b9
-.L_tc_recycle_frame_done_00b9:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
+.L_tc_recycle_frame_loop_00ba:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00ba
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00ba
+.L_tc_recycle_frame_done_00ba:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_007d:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00ba:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00ba
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00ba
-.L_tc_recycle_frame_done_00ba:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00b9:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00b9
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00b9
+.L_tc_recycle_frame_done_00b9:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0072
 .L_if_else_0072:
 	mov rax, PARAM(0)	; param vec
@@ -17165,7 +17716,7 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 1
 	mov r9, 2
 	call extend_lexical_environment
@@ -17224,69 +17775,75 @@ main:
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var vec
 	push rax
-	push qword 3 ; push m (num of args)
+	push 3
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 1]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 3 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00bb:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00bb
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00bb
-.L_tc_recycle_frame_done_00bb:
-	mov rsp, rbp
-	sub rsp, 48
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 24
+	mov r12, rdi
+	lea rdi, [r12 + 16]	; Dest_High
+	lea rsi, [rsp + 16]	; Source_High
+	mov r10, 3
+.L_tc_recycle_frame_loop_00bc:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00bc
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00bc
+.L_tc_recycle_frame_done_00bc:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0073:
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_007f:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00bc:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00bc
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00bc
-.L_tc_recycle_frame_done_00bc:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00bb:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00bb
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00bb
+.L_tc_recycle_frame_done_00bb:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_007e:	; new closure is in rax
@@ -17324,7 +17881,7 @@ main:
 	enter 0, 0
 	mov rax, L_constants + 1993
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 2
 	mov r9, 1
 	call extend_lexical_environment
@@ -17426,37 +17983,40 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_74]	; free var cons
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00bd:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00bd
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00bd
-.L_tc_recycle_frame_done_00bd:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
+.L_tc_recycle_frame_loop_00be:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00be
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00be
+.L_tc_recycle_frame_done_00be:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0074
 .L_if_else_0074:
 	mov rax, L_constants + 1
@@ -17471,66 +18031,72 @@ main:
 
 	mov rax, L_constants + 2232
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, PARAM(0)	; param run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00be:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00be
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00be
-.L_tc_recycle_frame_done_00be:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00bf:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00bf
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00bf
+.L_tc_recycle_frame_done_00bf:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0081:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00bf:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00bf
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00bf
-.L_tc_recycle_frame_done_00bf:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00bd:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00bd
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00bd
+.L_tc_recycle_frame_done_00bd:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(2)
 .L_lambda_simple_end_0080:	; new closure is in rax
@@ -17570,7 +18136,7 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 2
 	mov r9, 1
 	call extend_lexical_environment
@@ -17591,7 +18157,7 @@ main:
 	enter 0, 0
 	mov rax, L_constants + 1993
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 1
 	mov r9, 2
 	call extend_lexical_environment
@@ -17698,38 +18264,41 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00c0:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00c0
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00c0
-.L_tc_recycle_frame_done_00c0:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00c2:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00c2
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00c2
+.L_tc_recycle_frame_done_00c2:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0075
 .L_if_else_0075:
 	mov rax, ENV
@@ -17746,96 +18315,105 @@ main:
 
 	mov rax, L_constants + 2232
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, PARAM(0)	; param run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00c1:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00c1
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00c1
-.L_tc_recycle_frame_done_00c1:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00c3:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00c3
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00c3
+.L_tc_recycle_frame_done_00c3:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0085:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00c2:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00c2
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00c2
-.L_tc_recycle_frame_done_00c2:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00c1:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00c1
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00c1
+.L_tc_recycle_frame_done_00c1:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0084:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00c3:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00c3
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00c3
-.L_tc_recycle_frame_done_00c3:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00c0:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00c0
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00c0
+.L_tc_recycle_frame_done_00c0:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(2)
 .L_lambda_simple_end_0083:	; new closure is in rax
@@ -17875,7 +18453,7 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 2
 	mov r9, 1
 	call extend_lexical_environment
@@ -17896,7 +18474,7 @@ main:
 	enter 0, 0
 	mov rax, L_constants + 1993
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov r8, 1
 	mov r9, 2
 	call extend_lexical_environment
@@ -18003,38 +18581,41 @@ main:
 	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
 	call rbx
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, ENV
 	mov rax, qword [rax + 8 * 0]
 	mov rax, qword [rax + 8 * 0]	; bound var run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00c4:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00c4
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00c4
-.L_tc_recycle_frame_done_00c4:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00c6:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00c6
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00c6
+.L_tc_recycle_frame_done_00c6:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0076
 .L_if_else_0076:
 	mov rax, ENV
@@ -18051,96 +18632,105 @@ main:
 
 	mov rax, L_constants + 2232
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, PARAM(0)	; param run
 	mov rax, qword [rax]
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00c5:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00c5
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00c5
-.L_tc_recycle_frame_done_00c5:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00c7:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00c7
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00c7
+.L_tc_recycle_frame_done_00c7:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0089:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00c6:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00c6
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00c6
-.L_tc_recycle_frame_done_00c6:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00c5:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00c5
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00c5
+.L_tc_recycle_frame_done_00c5:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(1)
 .L_lambda_simple_end_0088:	; new closure is in rax
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
-.L_tc_recycle_frame_loop_00c7:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00c7
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
-	jmp .L_tc_recycle_frame_loop_00c7
-.L_tc_recycle_frame_done_00c7:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00c4:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00c4
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00c4
+.L_tc_recycle_frame_done_00c4:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(2)
 .L_lambda_simple_end_0087:	; new closure is in rax
@@ -18232,37 +18822,40 @@ main:
 	push rax
 	mov rax, L_constants + 3192
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_1]	; free var +
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_00c8:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00c8
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00c8
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00c8
 .L_tc_recycle_frame_done_00c8:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	jmp .L_if_end_0078
 .L_if_else_0078:
 	mov rax, PARAM(1)	; param b
@@ -18316,37 +18909,40 @@ main:
 	push rax
 	mov rax, L_constants + 3192
 	push rax
-	push qword 2 ; push m (num of args)
+	push 2
 	mov rax, qword [free_var_3]	; free var /
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 2 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
 .L_tc_recycle_frame_loop_00c9:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00c9
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00c9
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00c9
 .L_tc_recycle_frame_done_00c9:
-	mov rsp, rbp
-	sub rsp, 40
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 .L_if_end_0077:
 .L_if_end_0078:
 .L_if_end_0079:
@@ -18378,37 +18974,40 @@ main:
 	enter 0, 0
 	mov rax, L_constants + 3217
 	push rax
-	push qword 1 ; push m (num of args)
+	push 1
 	mov rax, qword [free_var_134]	; free var write-char
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
-	cmp byte [rax], T_closure ; check if proc is a closure
-	jne L_error_non_closure
-	mov rbx, [rax + 1] ; rbx <-- rax.env
-	push qword rbx ; push env
-	push qword [rbp + 8 * 1] ; push old ret address
-	mov rdi, rbp
-	mov rbp, [rbp]
-	mov qword rdx, 1 ; rdx = n
-	add rdx, 3
-	shl rdx, 3
-	xor rsi, rsi
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
 .L_tc_recycle_frame_loop_00ca:
-	cmp rsi, rdx
-	jge .L_tc_recycle_frame_done_00ca
-	mov r15, rdi
-	sub r15, rsi
-	mov rcx, [r15 - 8]
-	mov r15, rbp
-	sub r15, rsi
-	mov [r15 - 8], rcx
-	add rsi, 8
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00ca
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
 	jmp .L_tc_recycle_frame_loop_00ca
 .L_tc_recycle_frame_done_00ca:
-	mov rsp, rbp
-	sub rsp, 32
-	mov qword rbx, [rax + 1 + 8]
-	jmp rbx
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
 	leave
 	ret AND_KILL_FRAME(0)
 .L_lambda_simple_end_008c:	; new closure is in rax
@@ -18444,11 +19043,447 @@ main:
 
 	mov rdi, rax
 	call print_sexpr_if_not_void
+	mov rax, L_constants + 1993
+	push rax
+	push qword 1 ; Push n (num of args)
+	mov r8, 0
+	mov r9, 0
+	call extend_lexical_environment
+	mov r9, rax
+	mov rdi, 1 + 8 + 8
+	call malloc
+	mov byte [rax], T_closure
+	mov qword [rax + 1], r9
+	mov qword [rax + 1 + 8], .L_lambda_simple_code_008e
+	jmp .L_lambda_simple_end_008e
+.L_lambda_simple_code_008e:	
+	cmp qword [rsp + 8 * 2], 1
+	je .L_lambda_simple_arity_check_ok_008e
+	push qword [rsp + 8 * 2]
+	push 1
+	jmp L_error_incorrect_arity_simple
+.L_lambda_simple_arity_check_ok_008e:
+	enter 0, 0
+	mov rdi, 8 * 1
+	call malloc
+	mov rbx, PARAM(0)	; boxing fib$
+	mov qword [rax], rbx
+	mov PARAM(0), rax
+	mov rax, sob_void
 
-	push qword 0 ; Push n (num of args)
+	mov r8, 1
+	mov r9, 1
+	call extend_lexical_environment
+	mov r9, rax
+	mov rdi, 1 + 8 + 8
+	call malloc
+	mov byte [rax], T_closure
+	mov qword [rax + 1], r9
+	mov qword [rax + 1 + 8], .L_lambda_simple_code_008f
+	jmp .L_lambda_simple_end_008f
+.L_lambda_simple_code_008f:	
+	cmp qword [rsp + 8 * 2], 2
+	je .L_lambda_simple_arity_check_ok_008f
+	push qword [rsp + 8 * 2]
+	push 2
+	jmp L_error_incorrect_arity_simple
+.L_lambda_simple_arity_check_ok_008f:
+	enter 0, 0
+	mov rax, L_constants + 2868
+	push rax
+	mov rax, PARAM(0)	; param n
+	push rax
+	push qword 2 ; Push n (num of args)
+	mov rax, qword [free_var_4]	; free var <
+	cmp byte [rax], T_undefined
+	je L_error_fvar_undefined
+	cmp byte [rax], T_closure ; check if proc is a closure
+	jne L_error_non_closure
+	mov rbx, [rax + 1] ; rbx <-- rax.env
+	push qword rbx ; push env
+	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	call rbx
+	cmp rax, sob_boolean_false
+	je .L_if_else_007a
+	mov rax, PARAM(0)	; param n
+	push rax
+	push 1
+	mov rax, PARAM(1)	; param k
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00cb:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00cb
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00cb
+.L_tc_recycle_frame_done_00cb:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
+	jmp .L_if_end_007a
+.L_if_else_007a:
+	mov r8, 2
+	mov r9, 2
+	call extend_lexical_environment
+	mov r9, rax
+	mov rdi, 1 + 8 + 8
+	call malloc
+	mov byte [rax], T_closure
+	mov qword [rax + 1], r9
+	mov qword [rax + 1 + 8], .L_lambda_simple_code_0090
+	jmp .L_lambda_simple_end_0090
+.L_lambda_simple_code_0090:	
+	cmp qword [rsp + 8 * 2], 1
+	je .L_lambda_simple_arity_check_ok_0090
+	push qword [rsp + 8 * 2]
+	push 1
+	jmp L_error_incorrect_arity_simple
+.L_lambda_simple_arity_check_ok_0090:
+	enter 0, 0
+	mov r8, 1
+	mov r9, 3
+	call extend_lexical_environment
+	mov r9, rax
+	mov rdi, 1 + 8 + 8
+	call malloc
+	mov byte [rax], T_closure
+	mov qword [rax + 1], r9
+	mov qword [rax + 1 + 8], .L_lambda_simple_code_0091
+	jmp .L_lambda_simple_end_0091
+.L_lambda_simple_code_0091:	
+	cmp qword [rsp + 8 * 2], 1
+	je .L_lambda_simple_arity_check_ok_0091
+	push qword [rsp + 8 * 2]
+	push 1
+	jmp L_error_incorrect_arity_simple
+.L_lambda_simple_arity_check_ok_0091:
+	enter 0, 0
+	mov rax, PARAM(0)	; param fib-2
+	push rax
+	mov rax, ENV
+	mov rax, qword [rax + 8 * 0]
+	mov rax, qword [rax + 8 * 0]	; bound var fib-1
+	push rax
+	push qword 2 ; Push n (num of args)
 	mov rax, qword [free_var_1]	; free var +
 	cmp byte [rax], T_undefined
 	je L_error_fvar_undefined
+	cmp byte [rax], T_closure ; check if proc is a closure
+	jne L_error_non_closure
+	mov rbx, [rax + 1] ; rbx <-- rax.env
+	push qword rbx ; push env
+	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	call rbx
+	push rax
+	push 1
+	mov rax, ENV
+	mov rax, qword [rax + 8 * 1]
+	mov rax, qword [rax + 8 * 1]	; bound var k
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 8
+	mov r12, rdi
+	lea rdi, [r12 + 0]	; Dest_High
+	lea rsi, [rsp + 0]	; Source_High
+	mov r10, 1
+.L_tc_recycle_frame_loop_00ce:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00ce
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00ce
+.L_tc_recycle_frame_done_00ce:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
+	leave
+	ret AND_KILL_FRAME(1)
+.L_lambda_simple_end_0091:	; new closure is in rax
+	push rax
+	mov rax, L_constants + 2868
+	push rax
+	mov rax, ENV
+	mov rax, qword [rax + 8 * 0]
+	mov rax, qword [rax + 8 * 0]	; bound var n
+	push rax
+	push qword 2 ; Push n (num of args)
+	mov rax, qword [free_var_2]	; free var -
+	cmp byte [rax], T_undefined
+	je L_error_fvar_undefined
+	cmp byte [rax], T_closure ; check if proc is a closure
+	jne L_error_non_closure
+	mov rbx, [rax + 1] ; rbx <-- rax.env
+	push qword rbx ; push env
+	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	call rbx
+	push rax
+	push 2
+	mov rax, ENV
+	mov rax, qword [rax + 8 * 1]
+	mov rax, qword [rax + 8 * 0]	; bound var fib$
+	mov rax, qword [rax]
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
+.L_tc_recycle_frame_loop_00cd:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00cd
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00cd
+.L_tc_recycle_frame_done_00cd:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
+	leave
+	ret AND_KILL_FRAME(1)
+.L_lambda_simple_end_0090:	; new closure is in rax
+	push rax
+	mov rax, L_constants + 2292
+	push rax
+	mov rax, PARAM(0)	; param n
+	push rax
+	push qword 2 ; Push n (num of args)
+	mov rax, qword [free_var_2]	; free var -
+	cmp byte [rax], T_undefined
+	je L_error_fvar_undefined
+	cmp byte [rax], T_closure ; check if proc is a closure
+	jne L_error_non_closure
+	mov rbx, [rax + 1] ; rbx <-- rax.env
+	push qword rbx ; push env
+	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	call rbx
+	push rax
+	push 2
+	mov rax, ENV
+	mov rax, qword [rax + 8 * 0]
+	mov rax, qword [rax + 8 * 0]	; bound var fib$
+	mov rax, qword [rax]
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
+.L_tc_recycle_frame_loop_00cc:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00cc
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00cc
+.L_tc_recycle_frame_done_00cc:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
+.L_if_end_007a:
+	leave
+	ret AND_KILL_FRAME(2)
+.L_lambda_simple_end_008f:	; new closure is in rax
+	push rax
+	mov rax, PARAM(0)	; param fib$
+	pop qword [rax]
+	mov rax, sob_void
+
+	mov r8, 1
+	mov r9, 1
+	call extend_lexical_environment
+	mov r9, rax
+	mov rdi, 1 + 8 + 8
+	call malloc
+	mov byte [rax], T_closure
+	mov qword [rax + 1], r9
+	mov qword [rax + 1 + 8], .L_lambda_simple_code_0092
+	jmp .L_lambda_simple_end_0092
+.L_lambda_simple_code_0092:	
+	cmp qword [rsp + 8 * 2], 1
+	je .L_lambda_simple_arity_check_ok_0092
+	push qword [rsp + 8 * 2]
+	push 1
+	jmp L_error_incorrect_arity_simple
+.L_lambda_simple_arity_check_ok_0092:
+	enter 0, 0
+	mov rax, L_constants + 1
+	push rax
+	mov rax, PARAM(0)	; param f
+	push rax
+	push qword 2 ; Push n (num of args)
+	mov rax, qword [free_var_74]	; free var cons
+	cmp byte [rax], T_undefined
+	je L_error_fvar_undefined
+	cmp byte [rax], T_closure ; check if proc is a closure
+	jne L_error_non_closure
+	mov rbx, [rax + 1] ; rbx <-- rax.env
+	push qword rbx ; push env
+	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	call rbx
+	push rax
+	mov rax, L_constants + 3262
+	push rax
+	push qword 2 ; Push n (num of args)
+	mov rax, qword [free_var_74]	; free var cons
+	cmp byte [rax], T_undefined
+	je L_error_fvar_undefined
+	cmp byte [rax], T_closure ; check if proc is a closure
+	jne L_error_non_closure
+	mov rbx, [rax + 1] ; rbx <-- rax.env
+	push qword rbx ; push env
+	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	call rbx
+	push rax
+	mov rax, L_constants + 3232
+	push rax
+	push qword 2 ; Push n (num of args)
+	mov rax, qword [free_var_74]	; free var cons
+	cmp byte [rax], T_undefined
+	je L_error_fvar_undefined
+	cmp byte [rax], T_closure ; check if proc is a closure
+	jne L_error_non_closure
+	mov rbx, [rax + 1] ; rbx <-- rax.env
+	push qword rbx ; push env
+	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	call rbx
+	push rax
+	mov rax, L_constants + 3253
+	push rax
+	push 2
+	mov rax, qword [free_var_74]	; free var cons
+	cmp byte [rax], T_undefined
+	je L_error_fvar_undefined
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
+.L_tc_recycle_frame_loop_00d0:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00d0
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00d0
+.L_tc_recycle_frame_done_00d0:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
+	leave
+	ret AND_KILL_FRAME(1)
+.L_lambda_simple_end_0092:	; new closure is in rax
+	push rax
+	mov rax, L_constants + 3232
+	push rax
+	push 2
+	mov rax, PARAM(0)	; param fib$
+	mov rax, qword [rax]
+	assert_closure(rax)
+	push qword [rax + 1]
+	push qword [rbp + 8 * 1]
+	pop rbx
+	pop rcx
+	pop rdx
+	mov r8, qword [rbp]
+	mov r9, qword [rbp + 8 * 3]
+	lea rdi, [rbp + 8 * 4 + r9 * 8]
+	sub rdi, 16
+	mov r12, rdi
+	lea rdi, [r12 + 8]	; Dest_High
+	lea rsi, [rsp + 8]	; Source_High
+	mov r10, 2
+.L_tc_recycle_frame_loop_00cf:
+	cmp r10, 0
+	je .L_tc_recycle_frame_done_00cf
+	mov r11, qword [rsi]
+	mov qword [rdi], r11
+	sub rsi, 8
+	sub rdi, 8
+	dec r10
+	jmp .L_tc_recycle_frame_loop_00cf
+.L_tc_recycle_frame_done_00cf:
+	mov qword [r12 - 8], rdx	; New Count
+	mov qword [r12 - 16], rcx	; New Env
+	mov qword [r12 - 24], rbx	; Ret Addr
+	lea rsp, [r12 - 24]	; Update RSP
+	mov rbp, r8
+	jmp qword [rax + 1 + 8]
+	leave
+	ret AND_KILL_FRAME(1)
+.L_lambda_simple_end_008e:	; new closure is in rax
 	cmp byte [rax], T_closure ; check if proc is a closure
 	jne L_error_non_closure
 	mov rbx, [rax + 1] ; rbx <-- rax.env
@@ -19451,58 +20486,57 @@ L_code_ptr_lognot:
         ;;PARAM(0) = closure
 L_code_ptr_bin_apply:
         ;;jmp L_error_division_by_zero
-        enter 0,0
-        cmp qword COUNT, 2
+        enter 0, 0
+        cmp COUNT, 2
         jne L_error_arg_count_2
-
-
         mov rbx, PARAM(0)
-        mov r13, PARAM(1)
+        mov rcx, PARAM(1)
+        assert_closure(rbx)
+        xor rdx, rdx
+        cmp byte [rcx], T_nil
+        je .call_func
 
-        mov rax, rbx
-        cmp byte [rax], T_closure
-        jne L_error_non_closure
 
-        xor r12, r12
-        mov r14, r13
-        mov rsi, SOB_CLOSURE_ENV(rax)
-        mov rdi, SOB_CLOSURE_CODE(rax)
 
 .push_loop:
-        cmp byte [r14], T_nil
-        je .reverse
-        assert_pair(r14)
-        mov r15, SOB_PAIR_CAR(r14)
-        push r15
-        mov r14, SOB_PAIR_CDR(r14)
-        inc r12
+        cmp byte [rcx], T_pair
+        jne .reverse
+        mov r8, [rcx + 1]
+        push qword r8
+        inc rdx
+        mov rcx, [rcx + 1 + 8]
         jmp .push_loop
-.reverse:
-        mov r14, rsp
-        lea r15, [rsp + (8 * r12)]
-        
-.rev_loop: 
-        cmp r14, r15
-        jge .call_func 
-        mov rax, [r14] 
-        mov rdx, [r15- 8] 
-        mov [r14], rdx 
-        mov [r15 - 8], rax 
-        add r14, 8 
-        sub r15, 8 
-        jmp .rev_loop
 
+.reverse:
+        mov r10, rsp
+        mov r11, rsp
+        mov r12, rdx
+        cmp r12, 0
+        jle .call_func
+        dec r12
+        shl r12, 3
+        add r11, r12
+.reverse_loop:
+        cmp r10, r11
+        jge .call_func
+        mov r13, [r10]
+        mov r14, [r11]
+        mov [r10], r14
+        mov [r11], r13
+        add r10, 8
+        sub r11, 8
+        jmp .reverse_loop
 
 
 .call_func:
-        push r12
-
-        push rsi
-        call rdi
-
-
-        leave
-        ret
+        push qword rdx
+        mov r15, [rbx + 1]
+        push qword r15
+        mov rbx, [rbx + 1 + 8]
+        call rbx
+        leave 
+        ret AND_KILL_FRAME(2)
+        
 
 
 L_code_ptr_is_null:

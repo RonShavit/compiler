@@ -2234,9 +2234,77 @@ module Code_Generation : CODE_GENERATION = struct
 
 
 
-
-      (*TODO:: fix somthing with this [(+) doesnt work]*)
       | ScmApplic' (proc, args, Tail_Call) -> 
+      let label_loop = make_tc_applic_recycle_frame_loop () in
+      let label_done = make_tc_applic_recycle_frame_done () in
+      
+      let args_code =
+        String.concat ""
+          (List.map
+              (fun arg ->
+                let arg_code = run params env arg in
+                arg_code
+                ^ "\tpush rax\n")
+              (List.rev args)) in
+      let proc_code = run params env proc in
+      let n = List.length args in
+      
+      args_code
+      ^ (Printf.sprintf "\tpush %d\n" n)
+      ^ proc_code
+      ^ "\tassert_closure(rax)\n"
+      ^ "\tpush qword [rax + 1]\n"
+      ^ "\tpush qword [rbp + 8 * 1]\n"
+      (* stack: [ret] [env] [count] [arg0] ... [ArgN] *)
+      
+      (* Save ret addr,new env, new count to registers *)
+      ^ "\tpop rbx\n"
+      ^ "\tpop rcx\n"
+      ^ "\tpop rdx\n"
+      
+      (* r8- old rbp r9- Old Arg Count rdi- 1 higher address than the last old argument *)
+      ^ "\tmov r8, qword [rbp]\n"
+      ^ "\tmov r9, qword [rbp + 8 * 3]\n"
+      ^ "\tlea rdi, [rbp + 8 * 4 + r9 * 8]\n"
+      
+      (* rdi, r12- where we will start to copy the new arguments*)
+      ^ "\tsub rdi, " ^ (string_of_int (n * 8)) ^ "\n"
+      ^ "\tmov r12, rdi\n"
+      
+      (* rdi- where we want to copy the arguments*)
+      (* rsi-  where we plan to copy from the arguments*)
+      ^ "\tlea rdi, [r12 + " ^ (string_of_int ((n - 1) * 8)) ^ "]\t; Dest_High\n"
+      ^ "\tlea rsi, [rsp + " ^ (string_of_int ((n - 1) * 8)) ^ "]\t; Source_High\n"
+      
+      (* r10-  loop counter*)
+      ^ "\tmov r10, " ^ (string_of_int n) ^ "\n"
+      
+      ^ (Printf.sprintf "%s:\n" label_loop)
+      ^ "\tcmp r10, 0\n"
+      ^ (Printf.sprintf "\tje %s\n" label_done)
+      
+      (* Copy the argument *)
+      ^ "\tmov r11, qword [rsi]\n"
+      ^ "\tmov qword [rdi], r11\n"
+      
+      (* Move Pointers Down *)
+      ^ "\tsub rsi, 8\n"
+      ^ "\tsub rdi, 8\n"
+      ^ "\tdec r10\n"
+      ^ (Printf.sprintf "\tjmp %s\n" label_loop)
+      ^ (Printf.sprintf "%s:\n" label_done)
+      
+      (* puting back on the stack the new count, new env, ret addr *)
+      ^ "\tmov qword [r12 - 8], rdx\t; New Count\n"
+      ^ "\tmov qword [r12 - 16], rcx\t; New Env\n"
+      ^ "\tmov qword [r12 - 24], rbx\t; Ret Addr\n"
+      
+      (* rsp - ret addr rbp-old rbp and jum pto the call of the function in tail position *)
+      ^ "\tlea rsp, [r12 - 24]\t; Update RSP\n"
+      ^ "\tmov rbp, r8\n"
+      ^ "\tjmp qword [rax + 1 + 8]\n"
+      (*TODO:: fix somthing with this [(+) doesnt work]*)
+      (*| ScmApplic' (proc, args, Tail_Call) -> 
         (*run params env (ScmApplic' (proc, args, Non_Tail_Call))*) (*for testing everything but*)
         let args_code = String.concat "\n" (List.rev (List.map (fun exp' -> (run params env exp') ^ "\tpush rax") args)) in
         let m = string_of_int (List.length args) in
@@ -2247,36 +2315,49 @@ module Code_Generation : CODE_GENERATION = struct
         let app_code = app_code ^ "\tjne L_error_non_closure\n" in
         let app_code = app_code ^ "\tmov rbx, [rax + 1] ; rbx <-- rax.env\n" in
         let app_code = app_code ^ "\tpush qword rbx ; push env\n" in
+        let app_code = app_code ^ "\tmov rdx, [rbp + 8 * 1]\n" in
+        let app_code = app_code ^ "\tpush qword rdx ; push old ret address\n" in
 
-        let app_code = app_code ^ "\tpush qword [rbp + 8 * 1] ; push old ret address\n" in
-
-        let loop_label = make_tc_applic_recycle_frame_loop () in
+        (*let loop_label = make_tc_applic_recycle_frame_loop () in
         let done_label = make_tc_applic_recycle_frame_done () in
         let app_code = app_code ^ "\tmov rdi, rbp\n" in
         let app_code = app_code ^ "\tmov rbp, [rbp]\n" in
+      
+
+
         let app_code = app_code ^ (Printf.sprintf "\tmov qword rdx, %s ; rdx = n\n" m ) in
         let app_code = app_code ^ "\tadd rdx, 3\n" in
-        let app_code = app_code ^ "\tshl rdx, 3\n" in
-        let app_code = app_code ^ "\txor rsi, rsi\n" in
-        let app_code = app_code ^ (Printf.sprintf "%s:\n" loop_label) in
-        let app_code = app_code ^ "\tcmp rsi, rdx\n" in
-        let app_code = app_code ^ (Printf.sprintf "\tjge %s\n" done_label) in
-        let app_code = app_code ^ "\tmov r15, rdi\n" in
-        let app_code = app_code ^ "\tsub r15, rsi\n" in
-        let app_code = app_code ^ "\tmov rcx, [r15 - 8]\n" in
-        let app_code = app_code ^ "\tmov r15, rbp\n" in
-        let app_code = app_code ^ "\tsub r15, rsi\n" in
-        let app_code = app_code ^ "\tmov [r15 - 8], rcx\n" in
-        let app_code = app_code ^ "\tadd rsi, 8\n" in 
-        let app_code = app_code ^ (Printf.sprintf "\tjmp %s\n" loop_label) in
-        let app_code = app_code ^ (Printf.sprintf "%s:\n" done_label) in
-        let app_code = app_code ^ "\tmov rsp, rbp\n" in
-        let to_sub = string_of_int (8 * (3 + (int_of_string m))) in
-        let app_code = app_code ^(Printf.sprintf "\tsub rsp, %s\n" to_sub) in
 
+        let app_code = app_code ^ "\tlea rsi, [rdi -8]\n" in
+        let app_code = app_code ^ "\tlea rdi, [rbp - 8]\n" in
+
+        let app_code = app_code ^ "\tmov rcx, rdx\n" in
+        let app_code = app_code ^ "\tinc rcx\n" in
+
+
+        let app_code = app_code ^ (Printf.sprintf "%s:\n" loop_label) in
+
+        let app_code = app_code ^ "\tmov r8, [rsi]\n" in
+        let app_code = app_code ^ "\tmov [rdi], r8\n" in
+        let app_code = app_code ^ "\tsub rsi, 8\n" in
+        let app_code = app_code ^ "\tsub rdi, 8\n" in
+
+
+        let app_code = app_code ^ (Printf.sprintf "\tloop %s\n" loop_label) in
+        
+        let app_code = app_code ^ (Printf.sprintf "%s:\n" done_label) in
+
+        let app_code = app_code ^ "\tmov rcx, rdx\n" in
+        let app_code = app_code ^ "\tinc rcx\n" in
+        let app_code = app_code ^ "\tshl rcx, 3\n" in
+        let app_code = app_code ^ "\tmov rsp, rbp\n" in
+        let app_code = app_code ^ "\tsub rsp, rcx\n" in
+
+
+        *)
         let app_code = app_code ^ "\tmov qword rbx, [rax + 1 + 8]\n" in
         let app_code = app_code ^ "\tjmp rbx\n" in
-        app_code
+        app_code*)
         
 
 
