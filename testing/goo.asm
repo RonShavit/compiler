@@ -2031,34 +2031,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0001:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0001
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0001
 .L_tc_recycle_frame_done_0001:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -2108,34 +2101,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0002:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0002
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0002
 .L_tc_recycle_frame_done_0002:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -2185,34 +2171,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0003:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0003
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0003
 .L_tc_recycle_frame_done_0003:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -2262,34 +2241,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0004:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0004
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0004
 .L_tc_recycle_frame_done_0004:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -2339,34 +2311,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0005:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0005
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0005
 .L_tc_recycle_frame_done_0005:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -2416,34 +2381,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0006:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0006
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0006
 .L_tc_recycle_frame_done_0006:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -2493,34 +2451,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0007:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0007
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0007
 .L_tc_recycle_frame_done_0007:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -2570,34 +2521,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0008:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0008
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0008
 .L_tc_recycle_frame_done_0008:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -2647,34 +2591,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0009:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0009
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0009
 .L_tc_recycle_frame_done_0009:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -2724,34 +2661,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_000a:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_000a
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_000a
 .L_tc_recycle_frame_done_000a:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -2801,34 +2731,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_000b:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_000b
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_000b
 .L_tc_recycle_frame_done_000b:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -2878,34 +2801,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_000c:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_000c
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_000c
 .L_tc_recycle_frame_done_000c:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -2955,34 +2871,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_000d:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_000d
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_000d
 .L_tc_recycle_frame_done_000d:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -3032,34 +2941,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_000e:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_000e
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_000e
 .L_tc_recycle_frame_done_000e:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -3109,34 +3011,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_000f:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_000f
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_000f
 .L_tc_recycle_frame_done_000f:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -3186,34 +3081,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0010:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0010
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0010
 .L_tc_recycle_frame_done_0010:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -3263,34 +3151,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0011:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0011
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0011
 .L_tc_recycle_frame_done_0011:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -3340,34 +3221,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0012:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0012
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0012
 .L_tc_recycle_frame_done_0012:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -3417,34 +3291,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0013:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0013
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0013
 .L_tc_recycle_frame_done_0013:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -3494,34 +3361,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0014:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0014
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0014
 .L_tc_recycle_frame_done_0014:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -3571,34 +3431,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0015:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0015
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0015
 .L_tc_recycle_frame_done_0015:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -3648,34 +3501,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0016:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0016
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0016
 .L_tc_recycle_frame_done_0016:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -3725,34 +3571,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0017:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0017
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0017
 .L_tc_recycle_frame_done_0017:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -3802,34 +3641,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0018:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0018
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0018
 .L_tc_recycle_frame_done_0018:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -3879,34 +3711,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0019:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0019
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0019
 .L_tc_recycle_frame_done_0019:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -3956,34 +3781,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_001a:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_001a
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_001a
 .L_tc_recycle_frame_done_001a:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -4033,34 +3851,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_001b:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_001b
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_001b
 .L_tc_recycle_frame_done_001b:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -4110,34 +3921,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_001c:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_001c
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_001c
 .L_tc_recycle_frame_done_001c:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -4215,34 +4019,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_001d:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_001d
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_001d
 .L_tc_recycle_frame_done_001d:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0001
 .L_if_else_0001:
@@ -4357,34 +4154,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_001e:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_001e
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_001e
 .L_tc_recycle_frame_done_001e:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_or_end_0002:
 	leave
@@ -4507,34 +4297,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_001f:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_001f
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_001f
 .L_tc_recycle_frame_done_001f:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0003:
 	leave
@@ -4573,34 +4356,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0020:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0020
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0020
 .L_tc_recycle_frame_done_0020:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(2)
@@ -4650,34 +4426,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0021:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0021
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0021
 .L_tc_recycle_frame_done_0021:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(2)
@@ -4796,34 +4565,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0022:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0022
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0022
 .L_tc_recycle_frame_done_0022:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0004
 .L_if_else_0004:
@@ -4900,34 +4662,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0023:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0023
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0023
 .L_tc_recycle_frame_done_0023:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(2)
@@ -5091,34 +4846,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0024:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0024
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0024
 .L_tc_recycle_frame_done_0024:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_or_end_0003:
 	jmp .L_if_end_0005
@@ -5161,34 +4909,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0025:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0025
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0025
 .L_tc_recycle_frame_done_0025:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0006
 .L_if_else_0006:
@@ -5202,34 +4943,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0026:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0026
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0026
 .L_tc_recycle_frame_done_0026:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(2)
@@ -5384,34 +5118,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0027:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0027
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0027
 .L_tc_recycle_frame_done_0027:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0007
 .L_if_else_0007:
@@ -5470,34 +5197,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0028:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0028
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0028
 .L_tc_recycle_frame_done_0028:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0008
 .L_if_else_0008:
@@ -5512,34 +5232,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0029:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0029
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0029
 .L_tc_recycle_frame_done_0029:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(2)
@@ -5679,34 +5392,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_002a:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_002a
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_002a
 .L_tc_recycle_frame_done_002a:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0009:
 	leave
@@ -5835,34 +5541,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_002b:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_002b
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_002b
 .L_tc_recycle_frame_done_002b:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_000a:
 	leave
@@ -5918,34 +5617,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_002c:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_002c
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_002c
 .L_tc_recycle_frame_done_002c:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_000b:
 	leave
@@ -6018,34 +5710,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_002d:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_002d
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_002d
 .L_tc_recycle_frame_done_002d:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(2)
@@ -6060,34 +5745,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_002e:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_002e
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_002e
 .L_tc_recycle_frame_done_002e:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -6219,34 +5897,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_002f:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_002f
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_002f
 .L_tc_recycle_frame_done_002f:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_000c:
 	leave
@@ -6341,34 +6012,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0030:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0030
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0030
 .L_tc_recycle_frame_done_0030:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_000d:
 	leave
@@ -6446,34 +6110,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0031:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0031
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0031
 .L_tc_recycle_frame_done_0031:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_000e:
 	leave
@@ -6621,34 +6278,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0032:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0032
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0032
 .L_tc_recycle_frame_done_0032:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_000f:
 	leave
@@ -6689,34 +6339,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0033:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0033
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0033
 .L_tc_recycle_frame_done_0033:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(3)
@@ -6887,34 +6530,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0034:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0034
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0034
 .L_tc_recycle_frame_done_0034:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0010:
 	leave
@@ -6955,34 +6591,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0035:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0035
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0035
 .L_tc_recycle_frame_done_0035:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(3)
@@ -7070,34 +6699,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0036:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0036
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0036
 .L_tc_recycle_frame_done_0036:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(0)
@@ -7166,34 +6788,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0037:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0037
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0037
 .L_tc_recycle_frame_done_0037:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0013
 .L_if_else_0013:
@@ -7235,34 +6850,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0038:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0038
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0038
 .L_tc_recycle_frame_done_0038:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0012
 .L_if_else_0012:
@@ -7304,34 +6912,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0039:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0039
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0039
 .L_tc_recycle_frame_done_0039:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0011
 .L_if_else_0011:
@@ -7346,34 +6947,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_003a:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_003a
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_003a
 .L_tc_recycle_frame_done_003a:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0011:
 .L_if_end_0012:
@@ -7432,34 +7026,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_003b:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_003b
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_003b
 .L_tc_recycle_frame_done_003b:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0016
 .L_if_else_0016:
@@ -7490,34 +7077,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_003c:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_003c
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_003c
 .L_tc_recycle_frame_done_003c:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0015
 .L_if_else_0015:
@@ -7559,34 +7139,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_003d:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_003d
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_003d
 .L_tc_recycle_frame_done_003d:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0014
 .L_if_else_0014:
@@ -7601,34 +7174,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_003e:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_003e
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_003e
 .L_tc_recycle_frame_done_003e:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0014:
 .L_if_end_0015:
@@ -7687,34 +7253,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_003f:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_003f
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_003f
 .L_tc_recycle_frame_done_003f:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0019
 .L_if_else_0019:
@@ -7756,34 +7315,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0040:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0040
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0040
 .L_tc_recycle_frame_done_0040:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0018
 .L_if_else_0018:
@@ -7814,34 +7366,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0041:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0041
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0041
 .L_tc_recycle_frame_done_0041:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0017
 .L_if_else_0017:
@@ -7856,34 +7401,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0042:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0042
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0042
 .L_tc_recycle_frame_done_0042:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0017:
 .L_if_end_0018:
@@ -7901,34 +7439,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0043:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0043
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0043
 .L_tc_recycle_frame_done_0043:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_001a:
 .L_if_end_001b:
@@ -7973,34 +7504,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0044:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0044
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0044
 .L_tc_recycle_frame_done_0044:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -8088,34 +7612,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0045:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0045
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0045
 .L_tc_recycle_frame_done_0045:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(0)
@@ -8184,34 +7701,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0046:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0046
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0046
 .L_tc_recycle_frame_done_0046:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_001f
 .L_if_else_001f:
@@ -8253,34 +7763,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0047:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0047
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0047
 .L_tc_recycle_frame_done_0047:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_001e
 .L_if_else_001e:
@@ -8322,34 +7825,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0048:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0048
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0048
 .L_tc_recycle_frame_done_0048:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_001d
 .L_if_else_001d:
@@ -8364,34 +7860,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0049:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0049
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0049
 .L_tc_recycle_frame_done_0049:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_001d:
 .L_if_end_001e:
@@ -8450,34 +7939,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_004a:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_004a
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_004a
 .L_tc_recycle_frame_done_004a:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0022
 .L_if_else_0022:
@@ -8508,34 +7990,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_004b:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_004b
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_004b
 .L_tc_recycle_frame_done_004b:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0021
 .L_if_else_0021:
@@ -8577,34 +8052,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_004c:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_004c
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_004c
 .L_tc_recycle_frame_done_004c:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0020
 .L_if_else_0020:
@@ -8619,34 +8087,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_004d:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_004d
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_004d
 .L_tc_recycle_frame_done_004d:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0020:
 .L_if_end_0021:
@@ -8705,34 +8166,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_004e:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_004e
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_004e
 .L_tc_recycle_frame_done_004e:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0025
 .L_if_else_0025:
@@ -8774,34 +8228,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_004f:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_004f
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_004f
 .L_tc_recycle_frame_done_004f:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0024
 .L_if_else_0024:
@@ -8832,34 +8279,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0050:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0050
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0050
 .L_tc_recycle_frame_done_0050:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0023
 .L_if_else_0023:
@@ -8874,34 +8314,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0051:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0051
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0051
 .L_tc_recycle_frame_done_0051:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0023:
 .L_if_end_0024:
@@ -8919,34 +8352,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0052:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0052
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0052
 .L_tc_recycle_frame_done_0052:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0026:
 .L_if_end_0027:
@@ -9001,34 +8427,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0053:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0053
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0053
 .L_tc_recycle_frame_done_0053:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0029
 .L_if_else_0029:
@@ -9086,34 +8505,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0054:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0054
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0054
 .L_tc_recycle_frame_done_0054:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -9123,34 +8535,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0055:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0055
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0055
 .L_tc_recycle_frame_done_0055:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0029:
 	leave
@@ -9239,34 +8644,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0056:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0056
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0056
 .L_tc_recycle_frame_done_0056:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(0)
@@ -9335,34 +8733,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0057:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0057
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0057
 .L_tc_recycle_frame_done_0057:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_002c
 .L_if_else_002c:
@@ -9404,34 +8795,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0058:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0058
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0058
 .L_tc_recycle_frame_done_0058:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_002b
 .L_if_else_002b:
@@ -9473,34 +8857,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0059:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0059
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0059
 .L_tc_recycle_frame_done_0059:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_002a
 .L_if_else_002a:
@@ -9515,34 +8892,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_005a:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_005a
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_005a
 .L_tc_recycle_frame_done_005a:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_002a:
 .L_if_end_002b:
@@ -9601,34 +8971,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_005b:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_005b
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_005b
 .L_tc_recycle_frame_done_005b:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_002f
 .L_if_else_002f:
@@ -9659,34 +9022,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_005c:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_005c
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_005c
 .L_tc_recycle_frame_done_005c:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_002e
 .L_if_else_002e:
@@ -9728,34 +9084,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_005d:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_005d
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_005d
 .L_tc_recycle_frame_done_005d:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_002d
 .L_if_else_002d:
@@ -9770,34 +9119,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_005e:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_005e
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_005e
 .L_tc_recycle_frame_done_005e:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_002d:
 .L_if_end_002e:
@@ -9856,34 +9198,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_005f:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_005f
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_005f
 .L_tc_recycle_frame_done_005f:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0032
 .L_if_else_0032:
@@ -9925,34 +9260,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0060:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0060
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0060
 .L_tc_recycle_frame_done_0060:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0031
 .L_if_else_0031:
@@ -9983,34 +9311,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0061:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0061
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0061
 .L_tc_recycle_frame_done_0061:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0030
 .L_if_else_0030:
@@ -10025,34 +9346,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0062:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0062
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0062
 .L_tc_recycle_frame_done_0062:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0030:
 .L_if_end_0031:
@@ -10070,34 +9384,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0063:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0063
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0063
 .L_tc_recycle_frame_done_0063:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0033:
 .L_if_end_0034:
@@ -10142,34 +9449,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0064:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0064
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0064
 .L_tc_recycle_frame_done_0064:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -10257,34 +9557,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0065:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0065
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0065
 .L_tc_recycle_frame_done_0065:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(0)
@@ -10353,34 +9646,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0066:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0066
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0066
 .L_tc_recycle_frame_done_0066:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0038
 .L_if_else_0038:
@@ -10422,34 +9708,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0067:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0067
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0067
 .L_tc_recycle_frame_done_0067:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0037
 .L_if_else_0037:
@@ -10491,34 +9770,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0068:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0068
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0068
 .L_tc_recycle_frame_done_0068:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0036
 .L_if_else_0036:
@@ -10533,34 +9805,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0069:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0069
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0069
 .L_tc_recycle_frame_done_0069:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0036:
 .L_if_end_0037:
@@ -10619,34 +9884,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_006a:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_006a
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_006a
 .L_tc_recycle_frame_done_006a:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_003b
 .L_if_else_003b:
@@ -10677,34 +9935,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_006b:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_006b
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_006b
 .L_tc_recycle_frame_done_006b:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_003a
 .L_if_else_003a:
@@ -10746,34 +9997,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_006c:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_006c
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_006c
 .L_tc_recycle_frame_done_006c:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0039
 .L_if_else_0039:
@@ -10788,34 +10032,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_006d:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_006d
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_006d
 .L_tc_recycle_frame_done_006d:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0039:
 .L_if_end_003a:
@@ -10874,34 +10111,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_006e:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_006e
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_006e
 .L_tc_recycle_frame_done_006e:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_003e
 .L_if_else_003e:
@@ -10943,34 +10173,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_006f:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_006f
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_006f
 .L_tc_recycle_frame_done_006f:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_003d
 .L_if_else_003d:
@@ -11001,34 +10224,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0070:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0070
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0070
 .L_tc_recycle_frame_done_0070:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_003c
 .L_if_else_003c:
@@ -11043,34 +10259,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0071:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0071
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0071
 .L_tc_recycle_frame_done_0071:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_003c:
 .L_if_end_003d:
@@ -11088,34 +10297,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0072:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0072
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0072
 .L_tc_recycle_frame_done_0072:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_003f:
 .L_if_end_0040:
@@ -11170,34 +10372,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0073:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0073
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0073
 .L_tc_recycle_frame_done_0073:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0042
 .L_if_else_0042:
@@ -11255,34 +10450,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0074:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0074
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0074
 .L_tc_recycle_frame_done_0074:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -11292,34 +10480,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0075:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0075
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0075
 .L_tc_recycle_frame_done_0075:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0042:
 	leave
@@ -11411,34 +10592,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0076:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0076
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0076
 .L_tc_recycle_frame_done_0076:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0043:
 	leave
@@ -11585,34 +10759,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0077:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0077
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0077
 .L_tc_recycle_frame_done_0077:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(0)
@@ -11699,34 +10866,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0078:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0078
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0078
 .L_tc_recycle_frame_done_0078:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0046
 .L_if_else_0046:
@@ -11768,34 +10928,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0079:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0079
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0079
 .L_tc_recycle_frame_done_0079:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0045
 .L_if_else_0045:
@@ -11837,34 +10990,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_007a:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_007a
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_007a
 .L_tc_recycle_frame_done_007a:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0044
 .L_if_else_0044:
@@ -11879,34 +11025,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_007b:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_007b
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_007b
 .L_tc_recycle_frame_done_007b:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0044:
 .L_if_end_0045:
@@ -11965,34 +11104,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_007c:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_007c
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_007c
 .L_tc_recycle_frame_done_007c:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0049
 .L_if_else_0049:
@@ -12023,34 +11155,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_007d:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_007d
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_007d
 .L_tc_recycle_frame_done_007d:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0048
 .L_if_else_0048:
@@ -12092,34 +11217,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_007e:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_007e
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_007e
 .L_tc_recycle_frame_done_007e:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0047
 .L_if_else_0047:
@@ -12134,34 +11252,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_007f:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_007f
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_007f
 .L_tc_recycle_frame_done_007f:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0047:
 .L_if_end_0048:
@@ -12220,34 +11331,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0080:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0080
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0080
 .L_tc_recycle_frame_done_0080:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_004c
 .L_if_else_004c:
@@ -12289,34 +11393,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0081:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0081
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0081
 .L_tc_recycle_frame_done_0081:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_004b
 .L_if_else_004b:
@@ -12347,34 +11444,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0082:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0082
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0082
 .L_tc_recycle_frame_done_0082:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_004a
 .L_if_else_004a:
@@ -12389,34 +11479,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0083:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0083
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0083
 .L_tc_recycle_frame_done_0083:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_004a:
 .L_if_end_004b:
@@ -12434,34 +11517,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 0
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 0 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0084:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0084
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0084
 .L_tc_recycle_frame_done_0084:
 	mov rsp, rbp
 	sub rsp, 24
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_004d:
 .L_if_end_004e:
@@ -12568,34 +11644,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0085:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0085
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0085
 .L_tc_recycle_frame_done_0085:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(2)
@@ -12637,34 +11706,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0086:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0086
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0086
 .L_tc_recycle_frame_done_0086:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(2)
@@ -12717,34 +11779,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0087:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0087
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0087
 .L_tc_recycle_frame_done_0087:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(2)
@@ -12895,34 +11950,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0088:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0088
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0088
 .L_tc_recycle_frame_done_0088:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0050
 .L_if_else_0050:
@@ -12965,34 +12013,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0089:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0089
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0089
 .L_tc_recycle_frame_done_0089:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(2)
@@ -13005,34 +12046,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_008a:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_008a
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_008a
 .L_tc_recycle_frame_done_008a:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -13144,34 +12178,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_008b:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_008b
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_008b
 .L_tc_recycle_frame_done_008b:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(7)
@@ -13277,34 +12304,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_008c:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_008c
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_008c
 .L_tc_recycle_frame_done_008c:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -13498,34 +12518,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_008d:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_008d
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_008d
 .L_tc_recycle_frame_done_008d:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0051
 .L_if_else_0051:
@@ -13702,34 +12715,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_008e:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_008e
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_008e
 .L_tc_recycle_frame_done_008e:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -13739,34 +12745,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_008f:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_008f
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_008f
 .L_tc_recycle_frame_done_008f:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(2)
@@ -13947,34 +12946,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0090:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0090
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0090
 .L_tc_recycle_frame_done_0090:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -13984,34 +12976,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0091:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0091
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0091
 .L_tc_recycle_frame_done_0091:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(2)
@@ -14103,34 +13088,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0092:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0092
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0092
 .L_tc_recycle_frame_done_0092:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0058
 .L_if_else_0058:
@@ -14234,34 +13212,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0093:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0093
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0093
 .L_tc_recycle_frame_done_0093:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0058:
 	leave
@@ -14304,34 +13275,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0094:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0094
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0094
 .L_tc_recycle_frame_done_0094:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -14423,34 +13387,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0095:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0095
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0095
 .L_tc_recycle_frame_done_0095:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0059
 .L_if_else_0059:
@@ -14554,34 +13511,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0096:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0096
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0096
 .L_tc_recycle_frame_done_0096:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0059:
 	leave
@@ -14624,34 +13574,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0097:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0097
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0097
 .L_tc_recycle_frame_done_0097:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -14695,34 +13638,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0098:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0098
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0098
 .L_tc_recycle_frame_done_0098:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -14849,34 +13785,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_0099:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_0099
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_0099
 .L_tc_recycle_frame_done_0099:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_005a
 .L_if_else_005a:
@@ -14935,34 +13864,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_009a:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_009a
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_009a
 .L_tc_recycle_frame_done_009a:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -15098,34 +14020,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_009b:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_009b
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_009b
 .L_tc_recycle_frame_done_009b:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_005b
 .L_if_else_005b:
@@ -15184,34 +14099,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_009c:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_009c
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_009c
 .L_tc_recycle_frame_done_009c:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -15271,34 +14179,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_009d:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_009d
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_009d
 .L_tc_recycle_frame_done_009d:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -15339,34 +14240,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_009e:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_009e
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_009e
 .L_tc_recycle_frame_done_009e:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -15407,34 +14301,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_009f:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_009f
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_009f
 .L_tc_recycle_frame_done_009f:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -15486,34 +14373,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00a0:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00a0
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00a0
 .L_tc_recycle_frame_done_00a0:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -15563,34 +14443,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00a1:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00a1
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00a1
 .L_tc_recycle_frame_done_00a1:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -15643,34 +14516,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00a2:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00a2
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00a2
 .L_tc_recycle_frame_done_00a2:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_005c
 .L_if_else_005c:
@@ -15807,34 +14673,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00a3:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00a3
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00a3
 .L_tc_recycle_frame_done_00a3:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_005e
 .L_if_else_005e:
@@ -15951,34 +14810,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00a4:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00a4
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00a4
 .L_tc_recycle_frame_done_00a4:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0068
 .L_if_else_0068:
@@ -16069,34 +14921,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00a5:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00a5
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00a5
 .L_tc_recycle_frame_done_00a5:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0067
 .L_if_else_0067:
@@ -16145,34 +14990,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00a6:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00a6
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00a6
 .L_tc_recycle_frame_done_00a6:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0066
 .L_if_else_0066:
@@ -16221,34 +15059,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00a7:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00a7
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00a7
 .L_tc_recycle_frame_done_00a7:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0065
 .L_if_else_0065:
@@ -16265,34 +15096,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00a8:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00a8
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00a8
 .L_tc_recycle_frame_done_00a8:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0065:
 .L_if_end_0066:
@@ -16380,34 +15204,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00a9:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00a9
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00a9
 .L_tc_recycle_frame_done_00a9:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_006a
 .L_if_else_006a:
@@ -16435,34 +15252,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00aa:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00aa
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00aa
 .L_tc_recycle_frame_done_00aa:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_006a:
 .L_if_end_006b:
@@ -16651,34 +15461,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00ab:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00ab
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00ab
 .L_tc_recycle_frame_done_00ab:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -16688,34 +15491,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00ac:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00ac
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00ac
 .L_tc_recycle_frame_done_00ac:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_006c:
 	leave
@@ -16836,34 +15632,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 5
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 5 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00ad:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00ad
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00ad
 .L_tc_recycle_frame_done_00ad:
 	mov rsp, rbp
 	sub rsp, 64
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_006d
 .L_if_else_006d:
@@ -16948,34 +15737,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00ae:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00ae
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00ae
 .L_tc_recycle_frame_done_00ae:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -17171,34 +15953,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00af:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00af
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00af
 .L_tc_recycle_frame_done_00af:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -17208,34 +15983,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00b0:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00b0
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00b0
 .L_tc_recycle_frame_done_00b0:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_006e:
 	leave
@@ -17356,34 +16124,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 5
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 5 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00b1:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00b1
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00b1
 .L_tc_recycle_frame_done_00b1:
 	mov rsp, rbp
 	sub rsp, 64
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_006f
 .L_if_else_006f:
@@ -17468,34 +16229,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00b2:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00b2
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00b2
 .L_tc_recycle_frame_done_00b2:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -17565,34 +16319,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00b3:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00b3
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00b3
 .L_tc_recycle_frame_done_00b3:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -17653,34 +16400,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00b4:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00b4
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00b4
 .L_tc_recycle_frame_done_00b4:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -17893,34 +16633,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00b5:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00b5
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00b5
 .L_tc_recycle_frame_done_00b5:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -17930,34 +16663,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00b6:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00b6
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00b6
 .L_tc_recycle_frame_done_00b6:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0070
 .L_if_else_0070:
@@ -18071,34 +16797,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00b7:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00b7
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00b7
 .L_tc_recycle_frame_done_00b7:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0071:
 	leave
@@ -18109,34 +16828,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00b8:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00b8
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00b8
 .L_tc_recycle_frame_done_00b8:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -18358,34 +17070,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00b9:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00b9
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00b9
 .L_tc_recycle_frame_done_00b9:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -18395,34 +17100,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00ba:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00ba
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00ba
 .L_tc_recycle_frame_done_00ba:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0072
 .L_if_else_0072:
@@ -18536,34 +17234,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 3
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 3 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00bb:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00bb
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00bb
 .L_tc_recycle_frame_done_00bb:
 	mov rsp, rbp
 	sub rsp, 48
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0073:
 	leave
@@ -18574,34 +17265,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00bc:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00bc
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00bc
 .L_tc_recycle_frame_done_00bc:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -18751,34 +17435,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00bd:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00bd
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00bd
 .L_tc_recycle_frame_done_00bd:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0074
 .L_if_else_0074:
@@ -18802,34 +17479,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00be:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00be
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00be
 .L_tc_recycle_frame_done_00be:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -18839,34 +17509,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00bf:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00bf
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00bf
 .L_tc_recycle_frame_done_00bf:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(2)
@@ -19045,34 +17708,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00c0:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00c0
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00c0
 .L_tc_recycle_frame_done_00c0:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0075
 .L_if_else_0075:
@@ -19098,34 +17754,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00c1:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00c1
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00c1
 .L_tc_recycle_frame_done_00c1:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -19135,34 +17784,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00c2:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00c2
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00c2
 .L_tc_recycle_frame_done_00c2:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -19172,34 +17814,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00c3:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00c3
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00c3
 .L_tc_recycle_frame_done_00c3:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(2)
@@ -19378,34 +18013,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00c4:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00c4
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00c4
 .L_tc_recycle_frame_done_00c4:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0076
 .L_if_else_0076:
@@ -19431,34 +18059,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00c5:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00c5
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00c5
 .L_tc_recycle_frame_done_00c5:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -19468,34 +18089,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00c6:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00c6
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00c6
 .L_tc_recycle_frame_done_00c6:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(1)
@@ -19505,34 +18119,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00c7:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00c7
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00c7
 .L_tc_recycle_frame_done_00c7:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(2)
@@ -19634,34 +18241,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00c8:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00c8
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00c8
 .L_tc_recycle_frame_done_00c8:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	jmp .L_if_end_0078
 .L_if_else_0078:
@@ -19725,34 +18325,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 2
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 2 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00c9:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00c9
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00c9
 .L_tc_recycle_frame_done_00c9:
 	mov rsp, rbp
 	sub rsp, 40
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 .L_if_end_0077:
 .L_if_end_0078:
@@ -19794,34 +18387,27 @@ main:
 	mov rbx, [rax + 1] ; rbx <-- rax.env
 	push qword rbx ; push env
 	push qword [rbp + 8 * 1] ; push old ret address
-	mov rcx, [rbp + 8 * 3] ; rcx = old arg_count n
-	mov rbp, [rbp + 8 * 0]
-	xor rdi, rdi
-	mov rdx, 1
+	mov rdi, rbp
+	mov rbp, [rbp]
+	mov qword rdx, 1 ; rdx = n
 	add rdx, 3
+	shl rdx, 3
+	xor rsi, rsi
 .L_tc_recycle_frame_loop_00ca:
-	cmp rdi, rdx
+	cmp rsi, rdx
 	jge .L_tc_recycle_frame_done_00ca
-	xor r10, r10
-	mov r10, rcx
-	add r10, rdi
-	add r10, 5
-	shl r10, 3
+	mov r15, rdi
+	sub r15, rsi
+	mov rcx, [r15 - 8]
 	mov r15, rbp
-	sub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) 
-	mov rsi, [r15]
-	mov r14, rdi
-	inc r14
-	shl r14, 3
-	mov r15, rbp
-	sub r15, r14 ; r15 = rbp - 8 * (rdi+1) 
-	mov [r15], rsi
-	inc rdi
+	sub r15, rsi
+	mov [r15 - 8], rcx
+	add rsi, 8
 	jmp .L_tc_recycle_frame_loop_00ca
 .L_tc_recycle_frame_done_00ca:
 	mov rsp, rbp
 	sub rsp, 32
-	mov rbx, [rax + 1 + 8] ; rbx <-- rax.code
+	mov qword rbx, [rax + 1 + 8]
 	jmp rbx
 	leave
 	ret AND_KILL_FRAME(0)

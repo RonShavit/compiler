@@ -2256,54 +2256,28 @@ module Code_Generation : CODE_GENERATION = struct
         let app_code = app_code ^ "\tmov rbp, [rbp]\n" in
         let app_code = app_code ^ (Printf.sprintf "\tmov qword rdx, %s ; rdx = n\n" m ) in
         let app_code = app_code ^ "\tadd rdx, 3\n" in
+        let app_code = app_code ^ "\tshl rdx, 3\n" in
         let app_code = app_code ^ "\txor rsi, rsi\n" in
-        let app_code = app_code ^ (Printf.sprintf )
-        (*
-        let app_code = app_code ^ "\tmov rcx, [rbp + 8 * 3] ; rcx = old arg_count n\n" in
-        let app_code = app_code ^ "\tmov rbp, [rbp + 8 * 0]\n" in
-        let app_code = app_code ^ "\txor rdi, rdi\n" in
-        let app_code = app_code ^ (Printf.sprintf "\tmov rdx, %s\n" m) in
-        let app_code = app_code ^ "\tadd rdx, 3\n" in
-        (*rcx = n, rdx = m+3*)
-        let loop_label = make_tc_applic_recycle_frame_loop () in
-        let loop_done_lable = make_tc_applic_recycle_frame_done () in
-        let app_code = app_code ^ Printf.sprintf "%s:\n" loop_label in
-        let app_code = app_code ^ "\tcmp rdi, rdx\n" in
-        let app_code = app_code ^ (Printf.sprintf "\tjge %s\n" loop_done_lable) in
-        let app_code = app_code ^ "\txor r10, r10\n" in
-        let app_code = app_code ^ "\tmov r10, rcx\n" in
-        let app_code = app_code ^ "\tadd r10, rdi\n" in
-        let app_code = app_code ^ "\tadd r10, 5\n" in
-        let app_code = app_code ^ "\tshl r10, 3\n" in
+        let app_code = app_code ^ (Printf.sprintf "%s:\n" loop_label) in
+        let app_code = app_code ^ "\tcmp rsi, rdx\n" in
+        let app_code = app_code ^ (Printf.sprintf "\tjge %s\n" done_label) in
+        let app_code = app_code ^ "\tmov r15, rdi\n" in
+        let app_code = app_code ^ "\tsub r15, rsi\n" in
+        let app_code = app_code ^ "\tmov rcx, [r15 - 8]\n" in
         let app_code = app_code ^ "\tmov r15, rbp\n" in
-        let app_code = app_code ^ "\tsub r15, r10 ;r15 = rbp-(8 * (n+index + 5)) \n" in
-        let app_code = app_code ^ "\tmov rsi, [r15]\n" in
-        let app_code = app_code ^ "\tmov r14, rdi\n" in
-        let app_code = app_code ^ "\tinc r14\n" in
-        let app_code = app_code ^ "\tshl r14, 3\n" in
-        let app_code = app_code ^ "\tmov r15, rbp\n" in
-        let app_code = app_code ^ "\tsub r15, r14 ; r15 = rbp - 8 * (rdi+1) \n" in
-        let app_code = app_code ^ "\tmov [r15], rsi\n" in
-        let app_code = app_code ^ "\tinc rdi\n" in
-        let app_code = app_code ^ "\tjmp " ^ loop_label ^ "\n" in
-        let app_code = app_code ^ loop_done_lable ^ ":\n" in
-        (*let app_code = app_code ^ (Printf.sprintf "\tmov r13, %s\n" m) in
-        let app_code = app_code ^ "\tadd r13, 3\n" in
-        let app_code = app_code ^ "\tshl r13, 3\n" in
-        let app_code = app_code ^ "\tmov r15, rbp\n" in
-        let app_code = app_code ^ "\tsub r15, r13\n" in
-        let app_code = app_code ^ "\tmov rsp, r15" in
-        let app_code = app_code ^ "\t;;; this is where we would fix the stack ;)\n" in*)
+        let app_code = app_code ^ "\tsub r15, rsi\n" in
+        let app_code = app_code ^ "\tmov [r15 - 8], rcx\n" in
+        let app_code = app_code ^ "\tadd rsi, 8\n" in 
+        let app_code = app_code ^ (Printf.sprintf "\tjmp %s\n" loop_label) in
+        let app_code = app_code ^ (Printf.sprintf "%s:\n" done_label) in
         let app_code = app_code ^ "\tmov rsp, rbp\n" in
-        (*let app_code = app_code ^ (Printf.sprintf "\tsub rsp, (%s * 8)\n" m) in*)
-        let diff = ((int_of_string m) + 3) * 8 in
-        let diff = (string_of_int diff) in
-        let app_code = app_code ^ (Printf.sprintf "\tsub rsp, %s\n" diff) in*
+        let to_sub = string_of_int (8 * (3 + (int_of_string m))) in
+        let app_code = app_code ^(Printf.sprintf "\tsub rsp, %s\n" to_sub) in
 
-
-        let app_code = app_code ^ "\tmov rbx, [rax + 1 + 8] ; rbx <-- rax.code\n" in
+        let app_code = app_code ^ "\tmov qword rbx, [rax + 1 + 8]\n" in
         let app_code = app_code ^ "\tjmp rbx\n" in
         app_code
+        
 
 
 
